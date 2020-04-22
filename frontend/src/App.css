@@ -1,5 +1,9 @@
 .App {
   text-align: center;
+  font-family: 
+    'muli',
+    'roboto';
+  /* font-weight: 900; */
 }
 
 .App-logo {
