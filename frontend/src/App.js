@@ -1,43 +1,61 @@
 import React from 'react';
 import './App.css';
 import { connect } from 'react-redux'
+import { BrowserRouter, Switch, Route } from 'react-router-dom'
 
 import "typeface-roboto";
 import "typeface-muli"
 
-import gameContainer from './containers/gameContainer.js'
+import GameContainer from './containers/GameContainer.js'
 
 class App extends React.Component {
-  componentDidMount() {
-    fetch('http://localhost:3000/deck')
-    .then(r => r.json())
-    .then(deck => {
-      this.props.init(deck.cards)
-    })
+  setUsername = (e) => {
+    e.preventDefault()
+    this.props.setUsername(e.target[0].value)
   }
 
   render() {
     return (
       <div className="App">
-        sup
-        <p>testing testing yoyoyo</p>
-        {this.props.deck.map(card => card.name)}
-        {/* <gameContainer /> */}
+        {!this.props.username && 
+          <div>
+            <p className='title'>sup, time for some damn COUP</p>
+            <p>Enter name to play</p>
+            <form onSubmit={e => this.setUsername(e)}>
+              <input type='text'></input>
+              <button type='submit'>Set Username</button>
+            </form>
+          </div>
+        }
+
+        {this.props.username &&
+          <GameContainer />
+        }
+
+        {/* <BrowserRouter>
+          <div className="App">
+            <Switch>
+              <GameContainer />
+              <Route path='/test'>
+                <p>testing testing yoyoyo</p>
+              </Route>
+            </Switch>
+          </div>
+        </BrowserRouter> */}
       </div>
     )
   }
-
 }
 
 const mapStateToProps = (state) => {
   return {
-    deck: state.deck
+    username: state.playerReducer.username
   }
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    init: ((cards) => dispatch({type: 'initializeDeck', cards: cards}))
+    setUsername: ((username) => dispatch({type: 'setUsername', username: username}))
   }
 }
 

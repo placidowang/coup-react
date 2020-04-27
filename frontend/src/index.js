@@ -7,9 +7,11 @@ import * as serviceWorker from './serviceWorker';
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 // import someReducer from './reducers/testReducer.js'
-import deckReducer from './reducers/deckReducer.js'
+import deckReducer from './reducers/gameReducer.js'
+import rootReducer from './reducers/rootReducer.js'
 
-const store = createStore(deckReducer)
+
+const store = createStore(rootReducer)
 
 ReactDOM.render(
   // <React.StrictMode>
