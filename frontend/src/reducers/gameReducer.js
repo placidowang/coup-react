@@ -17,7 +17,10 @@ export default function gameReducer(state = initialState, action) {
         isPlaying: true
       }
     case 'shuffleDeck':
-      return state
+      return {
+        ...state,
+        deck: action.shuffledDeck
+      }
     default:
       return state
   }

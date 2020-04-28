@@ -17,7 +17,6 @@ class GameContainer extends React.Component {
       <div>
         {!this.props.isPlaying &&
           <div>
-            <p>Welcome, <span style={{color: 'red', fontSize: 40}}>{this.props.username}</span>.</p>
             <Lobby />
           </div>
         }
