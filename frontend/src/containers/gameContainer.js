@@ -1,17 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux'
 import Game from '../components/Game';
-// import '../components/Game.css';
-// import Board from '../components/Board';
-// import Swal from "sweetalert2";  
-// import shortid  from 'shortid';
 import Lobby from '../components/Lobby.js'
 
 class GameContainer extends React.Component {
-
-  // Check that the player is connected to a channel
-
-
   render() {  
     return (  
       <div>

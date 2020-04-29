@@ -1,6 +1,7 @@
 const initialState = {
   deck: [],
   isPlaying: false,
+  // isPlaying: true,
 
 }
 
@@ -11,15 +12,15 @@ export default function gameReducer(state = initialState, action) {
         ...state,
         deck: action.cards
       }
-    case 'startGame':
+    case 'playGame':
       return {
         ...state,
         isPlaying: true
       }
-    case 'shuffleDeck':
+    case 'updateDeck':
       return {
         ...state,
-        deck: action.shuffledDeck
+        deck: action.updatedDeck
       }
     default:
       return state

@@ -2,28 +2,52 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 class Lobby extends React.Component {
+  componentDidMount() {
+
+  }
+
+  componentDidUpdate() {
+    if (this.props.lobbyChannel) {
+      this.props.pubnub.getMessage(this.props.lobbyChannel, (msg) => {
+        switch (msg.message.type) {
+          case 'startGame':
+            console.log('Game start!!')
+            this.playGame()
+            break
+          case 'log':
+            console.log(msg.message.text)
+            break
+          default:
+            console.error('Unknown lobby message.')
+            console.log(msg)
+        }
+      })
+    }
+  }
+
   createLobby = () => {
+    console.log('You are the host!')
     const roomId = Math.random().toString(36).slice(2,7).toUpperCase()
-    // const roomId = 'AAA'
-    this.props.setRoomId(roomId)
-    this.props.createLobby(`react-coup-${roomId}`)
 
-    this.props.pubnub.subscribe({
-      channels: [`react-coup-${roomId}`],
-      withPresence: true
-    })
-
-    
+    this.props.setHost()
+    this.subscribeToLobby(roomId)
   }
 
   joinLobby = (e) => {
+    console.log('You are not the host.')
     e.preventDefault()
     const roomId = e.target[0].value.toUpperCase()
-    const lobbyChannel = `react-coup-${roomId}`
+
+    this.subscribeToLobby(roomId)
+  }
+
+  subscribeToLobby = (roomId) => {
+    const lobbyChannel = `coup-lobby-${roomId}`
 
     this.props.setRoomId(roomId)
     this.props.joinLobby(lobbyChannel)
 
+    console.log(`Joining lobbyChannel: ${lobbyChannel}`)
     this.props.pubnub.subscribe({
       channels: [lobbyChannel],
       withPresence: true
@@ -31,40 +55,46 @@ class Lobby extends React.Component {
   }
 
   startGame = () => {
-    console.log('starting game')
-    this.props.startGame()
-  }
+    if (!this.props.isHost) {
+      console.log('You are NOT the host!!')
+      return
+    } else {
+      console.log('Starting game')
 
-  componentDidUpdate() {
-    // console.log(this.props.pubnub)
-    // console.log(this.props.lobbyChannel)
-    if (this.props.lobbyChannel) {
-      // debugger
-      this.props.pubnub.getMessage(this.props.lobbyChannel, (msg) => {
-        console.log(msg.message.test)
+      // publish order for everyone to start game
+      this.props.pubnub.publish({
+        message: { type: 'startGame' },
+        channel: this.props.lobbyChannel
       })
+
     }
   }
 
-  componentWillUnmount() {
-    this.props.pubnub.unsubscribe({
-      channels: [this.props.lobbyChannel, this.props.gameChannel]
-    })
-  }
-  
-  testMsg = (msg) => {
-    this.props.pubnub.publish({
-      message: {
-        test: msg
-      },
-      channel: this.props.lobbyChannel
+  playGame = () => {
+    const gameChannel = `coup-game-${this.props.roomId}`
+
+    this.props.joinGame(gameChannel)
+
+    this.props.pubnub.subscribe({
+      channels: [gameChannel],
+      withPresence: true
     })
 
+    console.log(`Joining gameChannel: ${this.props.gameChannel}`)
+
+    this.props.playGame()
+  }
+
+  testMsg = (msg) => {
+    this.props.pubnub.publish({
+      message: {type: 'log', text: msg},
+      channel: this.props.lobbyChannel
+    })
   }
 
   hereNow = () => {
     this.props.pubnub.hereNow({
-      channels: [this.props.lobbyChannel]
+      channel: this.props.lobbyChannel
     })
     .then(console.log)
   }
@@ -109,7 +139,7 @@ const mapStateToProps = (state) => {
     pubnub: state.connectionReducer.pubnub,
     roomId: state.connectionReducer.roomId,
     lobbyChannel: state.connectionReducer.lobbyChannel,
-
+    gameChannel: state.connectionReducer.gameChannel,
     username: state.playerReducer.username,
     isHost: state.connectionReducer.isHost
   }
@@ -118,9 +148,10 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     setRoomId: ((roomId) => dispatch({type: 'setRoomId', roomId: roomId})),
-    createLobby: ((lobbyChannel) => dispatch({type: 'createLobby', lobbyChannel: lobbyChannel})),
+    setHost: (() => dispatch({type: 'setHost'})),
     joinLobby: ((lobbyChannel) => dispatch({type: 'joinLobby', lobbyChannel: lobbyChannel})),
-    startGame: (() => dispatch({type: 'startGame'})),
+    joinGame: ((gameChannel) => dispatch({type: 'joinGame', gameChannel: gameChannel})),
+    playGame: (() => dispatch({type: 'playGame'})),
   }
 }
 

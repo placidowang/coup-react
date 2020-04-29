@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import './App.css';
 import PubNubReact from 'pubnub-react';
 import keys from './PubNub-keys.js'
-import { BrowserRouter, Switch, Route } from 'react-router-dom'
+// import { BrowserRouter, Switch, Route } from 'react-router-dom'
 
 import "typeface-roboto";
 import "typeface-muli"

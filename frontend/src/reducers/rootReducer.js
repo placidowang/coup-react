@@ -24,18 +24,20 @@ function connectionReducer(state = initialState, action) {
         ...state,
         roomId: action.roomId
       }
-    case 'createLobby':
-      console.log(`Setting lobbyChannel to: ${action.lobbyChannel}`)
+    case 'setHost':
       return {
         ...state,
         isHost: true,
-        lobbyChannel: action.lobbyChannel
       }
     case 'joinLobby':
-      console.log(`Joining lobbyChannel to: ${action.lobbyChannel}`)
       return {
         ...state,
         lobbyChannel: action.lobbyChannel
+      }
+    case 'joinGame':
+      return {
+        ...state,
+        gameChannel: action.gameChannel
       }
     default:
       return state
