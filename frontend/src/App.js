@@ -13,6 +13,7 @@ import GameContainer from './containers/GameContainer.js'
 class App extends React.Component {
   constructor(props) {
     super(props)
+
     this.pubnub = new PubNubReact({
       publishKey: keys.publishKey, 
       subscribeKey: keys.subscribeKey    
@@ -27,8 +28,7 @@ class App extends React.Component {
 
   componentWillUnmount() {
     this.props.pubnub.unsubscribe({
-      channels: [this.props.lobbyChannel, this.props.gameChannel],
-      withPresence: false
+      channels: [this.props.lobbyChannel, this.props.gameChannel]
     })
   }
 

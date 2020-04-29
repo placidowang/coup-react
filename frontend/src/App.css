@@ -11,6 +11,11 @@
   color: rgb(255, 0, 0);
 }
 
+input {
+  font-size: 25px;
+  height: auto;
+}
+
 button {
   background-color: lightgrey;
   margin: 10px;

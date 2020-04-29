@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux'
+import Player from './Player.js'
 
 class Game extends React.Component {
   componentDidMount(){
@@ -31,22 +32,21 @@ class Game extends React.Component {
 
   initializeGame = (deckData) => {
     const deck = deckData.cards
-    this.props.initDeck(deck)
-    this.shuffleDeck()
+    this.shuffleDeck(deck)
+
   }
 
   componentDidUpdate() {
 
   }
 
-  shuffleDeck = () => {
-    let shuffledDeck = [...this.props.deck]
-    for (let i = shuffledDeck.length - 1; i > 0; i--) {
+  shuffleDeck = (deck = [...this.props.deck]) => {
+    for (let i = deck.length - 1; i > 0; i--) {
       let j = Math.floor(Math.random() * (i + 1));
-      [shuffledDeck[i], shuffledDeck[j]] = [shuffledDeck[j], shuffledDeck[i]]
+      [deck[i], deck[j]] = [deck[j], deck[i]]
     }
 
-    this.updateDeck(shuffledDeck)
+    this.updateDeck(deck)
   }
 
   updateDeck = (deck) => {
@@ -76,11 +76,13 @@ class Game extends React.Component {
         {/* <p>Players: {this.props.pubnub.hereNow({
           channels: [this.props.pubnub.gameChannel]
         })}</p> */}
-        <p>Deck: {this.props.deck.map(card => card.name + ", ")}</p>
-        <button onClick={this.shuffleDeck}>Shuffle Deck</button>
+        <p>Deck: {this.props.deck.map(card => card.name).join(', ')}</p>
+        <button onClick={()=>this.shuffleDeck()}>Shuffle Deck</button>
 
         <button onClick={() => this.testMsg('GAME YO')}>message</button>
-        <button onClick={this.hereNow}> who here</button>
+        <button onClick={this.hereNow}>who here</button>
+
+        <Player />
       </div>
     );
   }

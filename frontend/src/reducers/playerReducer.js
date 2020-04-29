@@ -2,6 +2,9 @@ const initialState = {
   id: NaN,
   // username: 'LORD DINGO',
   username: '',
+  hand: [],
+  coins: 2,
+  actions: ['Income', 'Foreign Aid', 'Coup', 'Tax', 'Assassinate', 'Exchange', 'Steal']
 }
 
 export default function playerReducer(state = initialState, action) {

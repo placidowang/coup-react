@@ -1,0 +1,17 @@
+.player-container {
+  margin: 5px;
+  border-color: black;
+  border-style: solid;
+  position: absolute;
+  bottom: 0px;
+  left: 50vw;
+  transform: translateX(-50%);
+}
+
+.player-container p {
+  font-size: 22px;
+}
+
+.player-name {
+  color: red;
+}

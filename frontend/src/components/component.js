@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-class Comp extends React.Component {
+class Asdf extends React.Component {
   render() {
     return(
       <div>
@@ -11,4 +11,4 @@ class Comp extends React.Component {
   }
 }
 
-export default connect()(Comp)
+export default connect()(Asdf)
