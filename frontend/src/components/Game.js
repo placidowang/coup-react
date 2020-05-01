@@ -18,6 +18,11 @@ class Game extends React.Component {
           case 'updateDeck':
             this.props.updateDeck(msg.message.updatedDeck)
             break
+          case 'addCardsToHand':
+            if (msg.message.playerId === this.props.player.id) {
+              this.props.addCardsToHand(msg.message.cards)
+            }
+            break
           case 'log':
             console.log(msg.message.text)
             break
@@ -29,16 +34,16 @@ class Game extends React.Component {
     // }
     // console.log(`Current players: ${this.props.players.map(player => player)}`)
   }
-
-  initializeGame = (deckData) => {
-    const deck = deckData.cards.map(card => ({...card, isRevealed: false}))
-    this.shuffleDeck(deck)
-
-  }
-
+  
   componentDidUpdate() {
     // console.log(this.props.deck)
 
+  }
+
+  initializeGame = (deckData) => {
+    const deck = deckData.cards.map(card => ({...card, isRevealed: false}))
+    const shuffledDeck = this.shuffleDeck(deck)
+    this.distributeCards(shuffledDeck)
   }
 
   shuffleDeck = (deck = [...this.props.deck]) => {
@@ -48,6 +53,7 @@ class Game extends React.Component {
     }
 
     this.updateDeck(deck)
+    return deck
   }
 
   updateDeck = (deck) => {
@@ -57,6 +63,44 @@ class Game extends React.Component {
     })
   }
 
+  // consider sending message for everyone to draw 2 cards
+  distributeCards = (deck) => {
+    for (const player of this.props.players) {
+      const card1 = deck.shift()
+      const card2 = deck.shift()
+
+      this.props.pubnub.publish({
+        message: {
+          type: 'addCardsToHand',
+          playerId: player.id,
+          cards: [card1, card2]
+        },
+        channel: this.props.gameChannel
+      })
+    }
+
+    this.updateDeck(deck)
+  }
+
+  // ehhhhhhhhh
+  // drawCard = () => {
+  //   const card = this.props.deck[0]
+  //   console.log('drew ' + card)
+  //   this.props.drawCard(card)
+  //   this.props.removeCardFromDeck()
+  // }
+
+  // need this in case players aren't automatically synced, which they probably won't be
+  updatePlayers = (players) => {
+
+  }
+
+  nextTurn = () => {
+    //whosturnisit + 1 % 5
+    
+    console.log(this.props.whosTurnIsIt)
+  }
+  
   testMsg = (msg) => {
     this.props.pubnub.publish({
       message: {type: 'log', text: msg},
@@ -94,15 +138,19 @@ const mapStateToProps = (state) => {
     pubnub: state.connectionReducer.pubnub,
     gameChannel: state.connectionReducer.gameChannel,
     isHost: state.connectionReducer.isHost,
-    players: state.connectionReducer.players,
-    deck: state.gameReducer.deck
+    player: state.playerReducer,
+    players: state.gameReducer.players,
+    deck: state.gameReducer.deck,
+    whosTurnIsIt: state.gameReducer.whosTurnIsIt,
   }
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
     initDeck: ((cards) => dispatch({type: 'initializeDeck', cards: cards})),
-    updateDeck: ((deck) => dispatch({type: 'updateDeck', updatedDeck: deck}))
+    updateDeck: ((deck) => dispatch({type: 'updateDeck', updatedDeck: deck})),
+    // drawCard: ((card) => dispatch({type: 'drawCard', card: card})),
+    addCardsToHand: ((cards) => dispatch({type: 'addCardsToHand', cards: cards}))
   }
 }
 

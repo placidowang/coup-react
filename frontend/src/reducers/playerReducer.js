@@ -9,7 +9,7 @@ const initialState = {
 }
 
 export default function playerReducer(state = initialState, action) {
-  switch(action.type) {
+  switch (action.type) {
     case 'setId':
       return {
         ...state,
@@ -19,6 +19,14 @@ export default function playerReducer(state = initialState, action) {
       return {
         ...state,
         username: action.username
+      }
+    // case 'drawCard':
+    //   state.hand.push(action.card)
+    //   return state
+    case 'addCardsToHand':
+      return {
+        ...state,
+        hand: [...state.hand, ...action.cards]
       }
     default:
       return state

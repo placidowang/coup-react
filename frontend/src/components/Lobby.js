@@ -17,7 +17,11 @@ class Lobby extends React.Component {
             console.log(msg.message.text)
             break
           case 'addToPlayers':
-            this.addToPlayers(msg.message.player)
+            this.props.isHost &&
+              this.addToPlayers(msg.message.player)
+            break
+          case 'updatePlayers':
+            this.updatePlayers(msg.message.players)
             break
           default:
             console.error('Unknown lobby message.')
@@ -25,13 +29,15 @@ class Lobby extends React.Component {
         }
       })
     }
+
+    // when there is a new activePlayer message, do I need to toggle myTurn?
   }
 
   createLobby = () => {
     console.log('You are the host!')
     const roomId = Math.random().toString(36).slice(2,7).toUpperCase()
 
-    // check if roomId already exists
+    // try again if roomId already exists
     this.props.pubnub.hereNow({channels: [`coup-lobby-${roomId}`]})
     .then(channel => {
       if (channel.totalOccupancy === 0) {
@@ -83,10 +89,21 @@ class Lobby extends React.Component {
   }
 
   addToPlayers = (player) => {
-    if (this.props.isHost) {
-      this.props.addToPlayers(player)
-      // console.log(this.props.players)
-      this.setState({}) // necessary to rerender playerlist? why not just updating reducer? is it because it's pushing player into array?
+    this.props.addToPlayers(player)
+    // console.log(this.props.players)
+    this.setState({}) // necessary to rerender playerlist? why not just updating reducer? is it because it's pushing player into array?
+    this.props.pubnub.publish({
+      message: {
+        type: 'updatePlayers',
+        players: this.props.players
+      },
+      channel: this.props.lobbyChannel
+    })
+  }
+
+  updatePlayers = (players) => {
+    if (!this.props.isHost) {
+      this.props.updatePlayers(players)
     }
   }
 
@@ -97,7 +114,7 @@ class Lobby extends React.Component {
     } else {
       console.log('Starting game')
 
-      // publish order for everyone to start game
+      // publish message for everyone to start game
       this.props.pubnub.publish({
         message: { type: 'startGame' },
         channel: this.props.lobbyChannel
@@ -164,7 +181,7 @@ class Lobby extends React.Component {
               {this.props.players.map(player => <p key={player.id}>{player.username}</p>)}
             </div>
 
-            <br/><button onClick={this.startGame}>BEGIN</button>
+            <br/><button onClick={this.startGame} className='start'>START</button>
             <button onClick={() => this.testMsg('i am hostman')}>send him a message</button>
             <button onClick={()=>this.testMsg('hey host')}>msg</button>
             <button onClick={this.hereNow}>who here</button>
@@ -196,6 +213,7 @@ const mapDispatchToProps = (dispatch) => {
     joinGame: ((gameChannel) => dispatch({type: 'joinGame', gameChannel: gameChannel})),
     addToPlayers: ((player) => dispatch({type: 'addToPlayers', player: player})),
     playGame: (() => dispatch({type: 'playGame'})),
+    updatePlayers: ((players) => dispatch({type: 'updatePlayers', players: players})),
   }
 }
 

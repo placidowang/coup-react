@@ -8,12 +8,13 @@ class Player extends React.Component {
   }
 
   render() {
+    const player = this.props.player
     return (
       <div className='player-container'>
-        <p className='player-name'>{this.props.username}</p>
-        <p>Current hand: </p>
-        <p>Coins: {this.props.coins}</p>
-        <p>Actions: {this.props.actions.join(', ')}</p>
+        <p className='player-name'>{player.username}</p>
+        <p>Current hand: {player.hand.map(card => card.name).join(', ')}</p>
+        <p>Coins: {player.coins}</p>
+        <p>Actions: {player.actions.join(', ')}</p>
       </div>
     )
   }
@@ -24,10 +25,6 @@ const mapStateToProps = (state) => {
     pubnub: state.connectionReducer.pubnub,
     gameChannel: state.connectionReducer.gameChannel,
     isHost: state.connectionReducer.isHost,
-    username: state.playerReducer.username,
-    hand: state.playerReducer.hand,
-    coins: state.playerReducer.coins,
-    actions: state.playerReducer.actions,
     players: state.connectionReducer.players,
     deck: state.gameReducer.deck,
     player: state.playerReducer,

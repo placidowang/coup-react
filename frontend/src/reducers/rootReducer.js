@@ -13,7 +13,7 @@ const initialState = {
 }
 
 function connectionReducer(state = initialState, action) {
-  switch(action.type) {
+  switch (action.type) {
     case 'initPubnub':
       return {
         ...state,

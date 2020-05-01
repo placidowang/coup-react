@@ -23,8 +23,24 @@ button {
   font-size: 25px;
 }
 
+button:active {
+  background-color: grey;
+}
+
 button.createLobby {
   background-color: rgb(44, 118, 255);
+}
+
+button.createLobby:active {
+  background-color: rgb(46, 213, 255);
+}
+
+button.start {
+  background-color: rgb(29, 175, 0)
+}
+
+button.start:active {
+  background-color: rgb(138, 250, 116)
 }
 
 .player-list {

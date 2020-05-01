@@ -1,12 +1,13 @@
 const initialState = {
   players: [], // pubnub.hereNow?
   deck: [],
-  turn: 0,
+  activePlayer: {},
+  whosTurnIsIt: 0,
   gameOver: false,
 }
 
 export default function gameReducer(state = initialState, action) {
-  switch(action.type) {
+  switch (action.type) {
     case 'initializeDeck':
       return {
         ...state,
@@ -20,6 +21,11 @@ export default function gameReducer(state = initialState, action) {
     case 'addToPlayers':
       state.players.push(action.player)
       return state
+    case 'updatePlayers':
+      return {
+        ...state,
+        players: action.players
+      }
     default:
       return state
   }
