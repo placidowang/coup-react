@@ -24,9 +24,7 @@ class GameContainer extends React.Component {
 const mapStateToProps = (state) => {
   return {
     pubnub: state.connectionReducer.pubnub,
-    username: state.playerReducer.username,
-    isPlaying: state.gameReducer.isPlaying,
-
+    isPlaying: state.connectionReducer.isPlaying,
   }
 }
 

@@ -3,6 +3,10 @@ import { connect } from 'react-redux'
 import './Player.css'
 
 class Player extends React.Component {
+  componentDidUpdate() {
+    // console.log(this.props.player)
+  }
+
   render() {
     return (
       <div className='player-container'>
@@ -25,7 +29,8 @@ const mapStateToProps = (state) => {
     coins: state.playerReducer.coins,
     actions: state.playerReducer.actions,
     players: state.connectionReducer.players,
-    deck: state.gameReducer.deck
+    deck: state.gameReducer.deck,
+    player: state.playerReducer,
   }
 }
 

@@ -11,11 +11,13 @@ class Lobby extends React.Component {
       this.props.pubnub.getMessage(this.props.lobbyChannel, (msg) => {
         switch (msg.message.type) {
           case 'startGame':
-            console.log('Game start!!')
             this.playGame()
             break
           case 'log':
             console.log(msg.message.text)
+            break
+          case 'addToPlayers':
+            this.addToPlayers(msg.message.player)
             break
           default:
             console.error('Unknown lobby message.')
@@ -29,8 +31,17 @@ class Lobby extends React.Component {
     console.log('You are the host!')
     const roomId = Math.random().toString(36).slice(2,7).toUpperCase()
 
-    this.props.setHost()
-    this.subscribeToLobby(roomId)
+    // check if roomId already exists
+    this.props.pubnub.hereNow({channels: [`coup-lobby-${roomId}`]})
+    .then(channel => {
+      if (channel.totalOccupancy === 0) {
+        this.props.setHost()
+        this.subscribeToLobby(roomId)
+      } else {
+        console.log('Trying a different roomId')
+        this.createLobby()
+      }
+    })
   }
 
   joinLobby = (e) => {
@@ -38,12 +49,21 @@ class Lobby extends React.Component {
     e.preventDefault()
     const roomId = e.target[0].value.toUpperCase()
 
-    this.subscribeToLobby(roomId)
+    // check if there's already 5 players:
+    this.props.pubnub.hereNow({channels: [`coup-lobby-${roomId}`]})
+    .then(channel => {
+      if (channel.totalOccupancy < 5) {
+        this.subscribeToLobby(roomId)
+      } else {
+        console.error('Room is full!')
+      }
+    })
   }
 
   subscribeToLobby = (roomId) => {
     const lobbyChannel = `coup-lobby-${roomId}`
 
+    // console.log(`Setting roomId to: ${roomId}`)
     this.props.setRoomId(roomId)
     this.props.joinLobby(lobbyChannel)
 
@@ -52,6 +72,22 @@ class Lobby extends React.Component {
       channels: [lobbyChannel],
       withPresence: true
     })
+    
+    this.props.pubnub.publish({
+      message: {
+        type: 'addToPlayers',
+        player: this.props.player
+      },
+      channel: lobbyChannel
+    })
+  }
+
+  addToPlayers = (player) => {
+    if (this.props.isHost) {
+      this.props.addToPlayers(player)
+      // console.log(this.props.players)
+      this.setState({}) // necessary to rerender playerlist? why not just updating reducer? is it because it's pushing player into array?
+    }
   }
 
   startGame = () => {
@@ -81,6 +117,7 @@ class Lobby extends React.Component {
     })
 
     console.log(`Joining gameChannel: ${this.props.gameChannel}`)
+    console.log('Game start!!')
 
     this.props.playGame()
   }
@@ -94,17 +131,20 @@ class Lobby extends React.Component {
 
   hereNow = () => {
     this.props.pubnub.hereNow({
-      channel: this.props.lobbyChannel
+      channels: [this.props.lobbyChannel]
     })
     .then(console.log)
   }
 
   render() {
+    // console.log('rendering: ' + this.props.players)
+    // this.props.players.map(player => console.log(player.username))
     return(
       <div>
+
         {!this.props.lobbyChannel &&
           <div>
-            <p>Welcome, <span style={{color: 'red', fontSize: 40}}>{this.props.username}</span>.</p>
+            <p>Welcome, <span style={{color: 'red', fontSize: 40}}>{this.props.player.username}</span>.</p>
             <button onClick={this.createLobby} className='createLobby'>Create Lobby</button>
 
             <form onSubmit={(e)=>this.joinLobby(e)}>
@@ -112,20 +152,22 @@ class Lobby extends React.Component {
               <button type='submit'>Join Lobby</button>
             </form>
 
-
           </div>
         }
 
         {this.props.lobbyChannel &&
           <div>
             <p>Room ID: <br/>{this.props.roomId}</p>
+            <div className='player-list'>
+            <p>Players: </p>
+              {/* <p>{this.props.player.username + ' (You)'}</p> */}
+              {this.props.players.map(player => <p key={player.id}>{player.username}</p>)}
+            </div>
+
             <br/><button onClick={this.startGame}>BEGIN</button>
-
             <button onClick={() => this.testMsg('i am hostman')}>send him a message</button>
-
             <button onClick={()=>this.testMsg('hey host')}>msg</button>
-
-            <button onClick={this.hereNow}> who here</button>
+            <button onClick={this.hereNow}>who here</button>
 
           </div>
         }
@@ -140,8 +182,9 @@ const mapStateToProps = (state) => {
     roomId: state.connectionReducer.roomId,
     lobbyChannel: state.connectionReducer.lobbyChannel,
     gameChannel: state.connectionReducer.gameChannel,
-    username: state.playerReducer.username,
-    isHost: state.connectionReducer.isHost
+    isHost: state.connectionReducer.isHost,
+    player: state.playerReducer,
+    players: state.gameReducer.players,
   }
 }
 
@@ -151,6 +194,7 @@ const mapDispatchToProps = (dispatch) => {
     setHost: (() => dispatch({type: 'setHost'})),
     joinLobby: ((lobbyChannel) => dispatch({type: 'joinLobby', lobbyChannel: lobbyChannel})),
     joinGame: ((gameChannel) => dispatch({type: 'joinGame', gameChannel: gameChannel})),
+    addToPlayers: ((player) => dispatch({type: 'addToPlayers', player: player})),
     playGame: (() => dispatch({type: 'playGame'})),
   }
 }

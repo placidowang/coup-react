@@ -1,8 +1,8 @@
 const initialState = {
+  players: [], // pubnub.hereNow?
   deck: [],
-  isPlaying: false,
-  // isPlaying: true,
-
+  turn: 0,
+  gameOver: false,
 }
 
 export default function gameReducer(state = initialState, action) {
@@ -12,16 +12,14 @@ export default function gameReducer(state = initialState, action) {
         ...state,
         deck: action.cards
       }
-    case 'playGame':
-      return {
-        ...state,
-        isPlaying: true
-      }
     case 'updateDeck':
       return {
         ...state,
         deck: action.updatedDeck
       }
+    case 'addToPlayers':
+      state.players.push(action.player)
+      return state
     default:
       return state
   }

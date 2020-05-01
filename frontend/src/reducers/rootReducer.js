@@ -3,12 +3,13 @@ import gameReducer from './gameReducer.js'
 import {combineReducers} from 'redux'
 
 const initialState = {
-  players: [], // pubnub.hereNow?
   pubnub: null,
   roomId: '',
   lobbyChannel: '',
   gameChannel: '',
   isHost: false,
+  isPlaying: false,
+  // isPlaying: true,  // probably don't use this anymore, game requires channel connection
 }
 
 function connectionReducer(state = initialState, action) {
@@ -19,7 +20,6 @@ function connectionReducer(state = initialState, action) {
         pubnub: action.pubnub
       }
     case 'setRoomId':
-      console.log(`Setting roomId to: ${action.roomId}`)
       return {
         ...state,
         roomId: action.roomId
@@ -38,6 +38,11 @@ function connectionReducer(state = initialState, action) {
       return {
         ...state,
         gameChannel: action.gameChannel
+      }
+    case 'playGame':
+      return {
+        ...state,
+        isPlaying: true
       }
     default:
       return state

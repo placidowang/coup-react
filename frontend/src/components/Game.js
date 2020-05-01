@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux'
-import Player from './Player.js'
+import Player from '../containers/Player.js'
 
 class Game extends React.Component {
   componentDidMount(){
@@ -31,12 +31,13 @@ class Game extends React.Component {
   }
 
   initializeGame = (deckData) => {
-    const deck = deckData.cards
+    const deck = deckData.cards.map(card => ({...card, isRevealed: false}))
     this.shuffleDeck(deck)
 
   }
 
   componentDidUpdate() {
+    // console.log(this.props.deck)
 
   }
 

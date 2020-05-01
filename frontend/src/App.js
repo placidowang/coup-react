@@ -18,7 +18,9 @@ class App extends React.Component {
       publishKey: keys.publishKey, 
       subscribeKey: keys.subscribeKey    
     })
-    this.pubnub.setUUID(Math.random().toString(36).slice(2,12))
+    const id = Math.random().toString(36).slice(2,12)
+    this.props.setId(id)
+    this.pubnub.setUUID(id)
     this.pubnub.init(this)
   }
 
@@ -82,6 +84,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     initPubnub: ((pubnub) => dispatch({type: 'initPubnub', pubnub: pubnub})),
+    setId: ((id) => dispatch({type: 'setId', id: id})),
     setUsername: ((username) => dispatch({type: 'setUsername', username: username})),
   }
 }
