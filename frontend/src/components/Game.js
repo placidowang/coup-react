@@ -19,9 +19,15 @@ class Game extends React.Component {
             this.props.updateDeck(msg.message.updatedDeck)
             break
           case 'addCardsToHand':
+            this.props.setActivePlayer()
             if (msg.message.playerId === this.props.player.id) {
               this.props.addCardsToHand(msg.message.cards)
             }
+            break
+          case 'nextTurn':
+            this.props.nextTurn()
+            console.log(this.props.whosTurnIsIt)
+            this.props.setActivePlayer()
             break
           case 'log':
             console.log(msg.message.text)
@@ -32,7 +38,8 @@ class Game extends React.Component {
         }
       })
     // }
-    // console.log(`Current players: ${this.props.players.map(player => player)}`)
+
+    // when there is a new activePlayer message, do I need to toggle myTurn?
   }
   
   componentDidUpdate() {
@@ -97,8 +104,11 @@ class Game extends React.Component {
 
   nextTurn = () => {
     //whosturnisit + 1 % 5
-    
-    console.log(this.props.whosTurnIsIt)
+
+    this.props.pubnub.publish({
+      message: { type: 'nextTurn' },
+      channel: this.props.gameChannel
+    })
   }
   
   testMsg = (msg) => {
@@ -115,18 +125,24 @@ class Game extends React.Component {
     .then(console.log)
   }
 
+  logPlayers = () => {
+    console.log(this.props.players)
+  }
+
   render() {
     return (
       <div>
-        {/* <p>Players: {this.props.pubnub.hereNow({
-          channels: [this.props.pubnub.gameChannel]
-        })}</p> */}
         <p>Deck: {this.props.deck.map(card => card.name).join(', ')}</p>
-        <button onClick={()=>this.shuffleDeck()}>Shuffle Deck</button>
 
+        <button onClick={()=>this.shuffleDeck()}>Shuffle Deck</button>
         <button onClick={() => this.testMsg('GAME YO')}>message</button>
         <button onClick={this.hereNow}>who here</button>
+        <button onClick={this.logPlayers}>Players</button>
+        <br/><button onClick={this.nextTurn}>End Turn</button>
 
+        <p>Who's turn: {this.props.activePlayer.username ? this.props.activePlayer.username : null}</p>
+
+        <p style={{fontSize: '20px'}}>Players: {this.props.players.map(player => player.username).join(', ')}</p>
         <Player />
       </div>
     );
@@ -142,6 +158,7 @@ const mapStateToProps = (state) => {
     players: state.gameReducer.players,
     deck: state.gameReducer.deck,
     whosTurnIsIt: state.gameReducer.whosTurnIsIt,
+    activePlayer: state.gameReducer.activePlayer,
   }
 }
 
@@ -150,7 +167,9 @@ const mapDispatchToProps = (dispatch) => {
     initDeck: ((cards) => dispatch({type: 'initializeDeck', cards: cards})),
     updateDeck: ((deck) => dispatch({type: 'updateDeck', updatedDeck: deck})),
     // drawCard: ((card) => dispatch({type: 'drawCard', card: card})),
-    addCardsToHand: ((cards) => dispatch({type: 'addCardsToHand', cards: cards}))
+    addCardsToHand: ((cards) => dispatch({type: 'addCardsToHand', cards: cards})),
+    setActivePlayer: (() => dispatch({type: 'setActivePlayer'})),
+    nextTurn: (() => dispatch({type: 'nextTurn'})),
   }
 }
 

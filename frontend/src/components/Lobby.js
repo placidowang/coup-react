@@ -29,8 +29,6 @@ class Lobby extends React.Component {
         }
       })
     }
-
-    // when there is a new activePlayer message, do I need to toggle myTurn?
   }
 
   createLobby = () => {

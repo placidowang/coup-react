@@ -26,6 +26,16 @@ export default function gameReducer(state = initialState, action) {
         ...state,
         players: action.players
       }
+    case 'setActivePlayer':
+      return {
+        ...state,
+        activePlayer: state.players[state.whosTurnIsIt]
+      }
+    case 'nextTurn':
+      return {
+        ...state,
+        whosTurnIsIt: (state.whosTurnIsIt + 1) % state.players.length
+      }
     default:
       return state
   }
