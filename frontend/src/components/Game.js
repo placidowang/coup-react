@@ -103,13 +103,13 @@ class Game extends React.Component {
   }
 
   nextTurn = () => {
-    //whosturnisit + 1 % 5
-
     this.props.pubnub.publish({
       message: { type: 'nextTurn' },
       channel: this.props.gameChannel
     })
   }
+
+
   
   testMsg = (msg) => {
     this.props.pubnub.publish({

@@ -36,7 +36,12 @@ class App extends React.Component {
 
   setUsername = (e) => {
     e.preventDefault()
-    this.props.setUsername(e.target[0].value)
+    const username = e.target[0].value
+    if (username !== "") {
+      this.props.setUsername(username)
+    } else {
+      console.error('Please enter a username.')
+    }
   }
 
   render() {
