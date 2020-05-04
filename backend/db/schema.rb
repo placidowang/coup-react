@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_23_095137) do
+ActiveRecord::Schema.define(version: 2020_05_04_063524) do
 
   create_table "cards", force: :cascade do |t|
     t.string "name"
@@ -21,6 +21,7 @@ ActiveRecord::Schema.define(version: 2020_04_23_095137) do
     t.string "action"
     t.string "effect"
     t.string "counteraction"
+    t.string "description"
   end
 
   create_table "decks", force: :cascade do |t|

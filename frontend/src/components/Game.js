@@ -140,7 +140,7 @@ class Game extends React.Component {
         <button onClick={this.logPlayers}>Players</button>
         <br/><button onClick={this.nextTurn}>End Turn</button>
 
-        <p>Who's turn: {this.props.activePlayer.username ? this.props.activePlayer.username : null}</p>
+        <p>Whose turn: {this.props.activePlayer.username ? this.props.activePlayer.username : null}</p>
 
         <p style={{fontSize: '20px'}}>Players: {this.props.players.map(player => player.username).join(', ')}</p>
         <Player />

@@ -6,6 +6,7 @@
   bottom: 0px;
   left: 50vw;
   transform: translateX(-50%);
+  display: inline-flex;
 }
 
 .player-container p {
@@ -14,4 +15,8 @@
 
 .player-name {
   color: red;
+}
+
+.hand {
+  display: inline-flex;
 }

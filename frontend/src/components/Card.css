@@ -1,0 +1,60 @@
+.card {
+  border-style: solid;
+  border-color: black;
+  border-width: 5px;
+  border-radius: 15px;
+  height: 300px;
+  width: 216px;
+  /* width: auto; */
+  margin: 5px;
+}
+
+.duke {
+  background-color: rgb(255, 218, 235);
+}
+
+.assassin {
+  background-color: rgb(218, 218, 218);
+}
+
+.captain {
+  background-color: rgb(195, 226, 255);
+}
+
+.ambassador {
+  background-color: rgb(250, 238, 199);
+}
+
+.contessa {
+  background-color: rgb(255, 191, 191);
+}
+
+.card-name {
+  text-align: center;
+  font-size: 22px;
+  margin: 0px;
+  font-weight: bold;
+}
+
+.portrait {
+  height: 200px;
+  border-style: solid;
+  border-color: black;
+  border-width: 3px;
+  margin: 5px 5px 0px;
+}
+
+.card-info {
+  text-align: left;
+  margin: 0px 5px;
+}
+
+.card-info p {
+  font-size: 14px;
+  margin: 0px;
+}
+
+.card h3 {
+  font-size: 18px;
+  margin: 0px;
+}

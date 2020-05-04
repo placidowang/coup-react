@@ -1,6 +1,6 @@
 const initialState = {
   id: NaN,
-  username: Math.random().toString(36).slice(2,10),
+  username: Math.random().toString(36).slice(2,5),
   // username: '',
   hand: [],
   coins: 2,

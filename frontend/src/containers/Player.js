@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import './Player.css'
+import Card from '../components/Card.js'
 
 class Player extends React.Component {
   componentDidMount() {
@@ -41,7 +42,11 @@ class Player extends React.Component {
     return (
       <div className='player-container'>
         <p className='player-name'>{player.username}</p>
-        <p>Current hand: {player.hand.map(card => card.name).join(', ')}</p>
+        {/* <p>Current hand: {player.hand.map(card => card.name).join(', ')}</p> */}
+        <p>Current hand: </p>
+        <div className='hand'>
+          {player.hand.map(card => <Card card={card} />)}
+        </div>
         <p>Coins: {player.coins}</p>
         <div>Actions: {player.actions.map(action => 
           <button onClick={e => this.takeAction(e.target.value)} value={action} key={action}>{action}</button>)}</div>
