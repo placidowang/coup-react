@@ -23,6 +23,12 @@ class Game extends React.Component {
           case 'updatePlayer':
             this.props.updatePlayer(msg.message.player)
             break
+          case 'changeTreasury':
+            this.props.changeTreasury(msg.message.amt)
+            break
+          case 'updateTreasury':
+            this.props.updateTreasury(msg.message.treasury)
+            break
           case 'addCardsToHand':
             this.props.setActivePlayer()
             if (msg.message.playerId === this.props.player.id) {
@@ -44,7 +50,7 @@ class Game extends React.Component {
       })
     // }
 
-    this.props.updateTreasury(-(this.props.players.length * 2))
+    this.props.changeTreasury(-(this.props.players.length * 2))
     // when there is a new activePlayer message, do I need to toggle myTurn? -so far no
   }
   
@@ -179,7 +185,8 @@ const mapDispatchToProps = (dispatch) => {
     updatePlayer: ((player) => dispatch({type: 'updatePlayer', player: player})),
     // drawCard: ((card) => dispatch({type: 'drawCard', card: card})),
     addCardsToHand: ((cards) => dispatch({type: 'addCardsToHand', cards: cards})),
-    updateTreasury: ((amt) => dispatch({type: 'updateTreasury', amt: amt})),
+    changeTreasury: ((amt) => dispatch({type: 'changeTreasury', amt: amt})),
+    updateTreasury: ((treasury) => dispatch({type: 'updateTreasury', treasury: treasury})),
     setActivePlayer: (() => dispatch({type: 'setActivePlayer'})),
     endTurn: (() => dispatch({type: 'endTurn'})),
   }

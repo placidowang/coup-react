@@ -86,8 +86,9 @@ class Lobby extends React.Component {
     })
   }
 
-  addToPlayers = (player) => {
-    this.props.addToPlayers(player)
+  // async/await, just in case
+  addToPlayers = async(player) => {
+    await this.props.addToPlayers(player)
     // console.log(this.props.players)
     this.props.pubnub.publish({
       message: {
@@ -154,10 +155,10 @@ class Lobby extends React.Component {
     // this.props.players.map(player => console.log(player.username))
     return(
       <div>
+        <p>Welcome, <span style={{color: 'red', fontSize: 40}}>{this.props.player.username}</span>.</p>
 
         {!this.props.lobbyChannel &&
           <div>
-            <p>Welcome, <span style={{color: 'red', fontSize: 40}}>{this.props.player.username}</span>.</p>
             <button onClick={this.createLobby} className='createLobby'>Create Lobby</button>
 
             <form onSubmit={(e)=>this.joinLobby(e)}>

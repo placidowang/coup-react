@@ -34,7 +34,7 @@ class Player extends React.Component {
   }
 
   updatePlayer = () => {
-    console.log(this.props.player.coins + 'coins')
+    // console.log(this.props.player.coins + 'coins')
     this.props.pubnub.publish({
       message: {
         type: 'updatePlayer',
@@ -44,10 +44,22 @@ class Player extends React.Component {
     })
   }
 
-  updateCoins = (amt) => {
-    this.props.updateCoins(amt)
-    this.props.updateTreasury(-amt)
+  updateTreasury = () => {
+    // console.log(this.props.treasury)
+    this.props.pubnub.publish({
+      message: {
+        type: 'updateTreasury',
+        treasury: this.props.treasury
+      },
+      channel: this.props.gameChannel
+    })
+  }
+
+  updateCoins = async(amt) => {
+    await this.props.updateCoins(amt)
     this.updatePlayer()
+    await this.props.changeTreasury(-amt)
+    this.updateTreasury()
   }
 
   endTurn = () => {
@@ -96,6 +108,7 @@ const mapStateToProps = (state) => {
     isHost: state.connectionReducer.isHost,
     players: state.connectionReducer.players,
     deck: state.gameReducer.deck,
+    treasury: state.gameReducer.treasury,
     player: state.playerReducer,
     activePlayer: state.gameReducer.activePlayer,
   }
@@ -105,7 +118,7 @@ const mapDispatchToProps = (dispatch) => {
   return {
     endTurn: (() => dispatch({type: 'endTurn'})),
     updateCoins: ((amt) => dispatch({type: 'updateCoins', amt: amt})),
-    updateTreasury: ((amt) => dispatch({type: 'updateTreasury', amt: amt})),
+    changeTreasury: ((amt) => dispatch({type: 'changeTreasury', amt: amt})),
   }
 }
 

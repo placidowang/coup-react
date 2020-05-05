@@ -25,9 +25,13 @@ export default function gameReducer(state = initialState, action) {
       return {...state,
         players: updatedPlayers
       }
-    case 'updateTreasury':
+    case 'changeTreasury':
       return {...state,
         treasury: state.treasury + action.amt
+      }
+    case 'updateTreasury':
+      return {...state,
+        treasury: action.treasury
       }
     case 'addToPlayers':
       const newPlayers = [...state.players]
