@@ -15,33 +15,27 @@ const initialState = {
 function connectionReducer(state = initialState, action) {
   switch (action.type) {
     case 'initPubnub':
-      return {
-        ...state,
+      return {...state,
         pubnub: action.pubnub
       }
     case 'setRoomId':
-      return {
-        ...state,
+      return {...state,
         roomId: action.roomId
       }
     case 'setHost':
-      return {
-        ...state,
+      return {...state,
         isHost: true,
       }
     case 'joinLobby':
-      return {
-        ...state,
+      return {...state,
         lobbyChannel: action.lobbyChannel
       }
     case 'joinGame':
-      return {
-        ...state,
+      return {...state,
         gameChannel: action.gameChannel
       }
     case 'playGame':
-      return {
-        ...state,
+      return {...state,
         isPlaying: true
       }
     default:

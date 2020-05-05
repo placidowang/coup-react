@@ -1,0 +1,19 @@
+.opponents-container {
+  display: inline-flex;
+  justify-content: center;
+  border-style: solid;
+  border-color: black;
+  width: 100vw;
+  margin: -11px;
+}
+
+.opponent {
+  border-style: solid;
+  border-color: black;
+  margin: 10px;
+}
+
+.opponent p {
+  font-size: 20px;
+  margin: 0px;
+}

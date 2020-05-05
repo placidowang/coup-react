@@ -5,51 +5,85 @@ import Card from '../components/Card.js'
 
 class Player extends React.Component {
   componentDidMount() {
-    // this.props.pubnub.getMessage(this.props.gameChannel, (msg) => {
-    //   switch (msg.message.type) {
 
-    //     case 'nextTurn':
-    //       this.props.nextTurn()
-    //       console.log(this.props.whosTurnIsIt)
-    //       this.props.setActivePlayer()
-    //       break
-    //     case 'log':
-    //       console.log(msg.message.text)
-    //       break
-    //     default:
-    //       console.error('Unknown player message.')
-    //       console.log(msg)
-    //   }
-    // })
   }
+  
   componentDidUpdate() {
     // console.log(this.props.player)
   }
 
-  takeAction = (action) => {
-    console.log(action)
+  yourTurn = () => {
+    return (this.props.activePlayer.id === this.props.player.id)
   }
 
-  // nextTurn = () => {
-  //   this.props.pubnub.publish({
-  //     message: { type: 'nextTurn' },
-  //     channel: this.props.gameChannel
-  //   })
-  // }
+  // don't need to account for turn anymore; actions are disabled if it's not your turn
+  takeAction = (action) => {
+    console.log(action)
+    switch (action) {
+      case 'Income':
+        this.updateCoins(1)
+        this.endTurn()
+        break
+      case 'Foreign Aid':
+        this.updateCoins(2)
+        this.endTurn()
+        break
+      default:
+        console.error('Invalid player action')
+    }
+  }
+
+  updatePlayer = () => {
+    console.log(this.props.player.coins + 'coins')
+    this.props.pubnub.publish({
+      message: {
+        type: 'updatePlayer',
+        player: this.props.player
+      },
+      channel: this.props.gameChannel
+    })
+  }
+
+  updateCoins = (amt) => {
+    this.props.updateCoins(amt)
+    this.props.updateTreasury(-amt)
+    this.updatePlayer()
+  }
+
+  endTurn = () => {
+    this.props.pubnub.publish({
+      message: { type: 'endTurn' },
+      channel: this.props.gameChannel
+    })
+  }
 
   render() {
     const player = this.props.player
+    const actions = []
+    for (const action in this.props.player.actions) {
+      actions.push(this.props.player.actions[action])
+    }
     return (
       <div className='player-container'>
-        <p className='player-name'>{player.username}</p>
-        {/* <p>Current hand: {player.hand.map(card => card.name).join(', ')}</p> */}
-        <p>Current hand: </p>
-        <div className='hand'>
-          {player.hand.map(card => <Card card={card} />)}
+        <div className='player-name-hand-coin-container'>
+          <div className='player-name-coins-container'>
+            <p className='player-name'>{player.username}</p>
+            <p className='coins'>Coins: {player.coins}</p>
+          </div>
+          <div className='hand-container'>
+            <p>Hand </p>
+            <div className='hand'>
+              {player.hand.map(card => <Card key={card.id} card={card} />)}
+            </div>
+          </div>
         </div>
-        <p>Coins: {player.coins}</p>
-        <div>Actions: {player.actions.map(action => 
-          <button onClick={e => this.takeAction(e.target.value)} value={action} key={action}>{action}</button>)}</div>
+        <div className='actions'>Actions: 
+          {actions.map(action => 
+            <div className='actions' key={action.action}>
+              <button onClick={e => this.takeAction(e.target.value)} value={action.action} disabled={this.yourTurn() ? '' : 'disabled'}>{action.action}</button>
+            </div>
+          )}
+        </div>
       </div>
     )
   }
@@ -63,12 +97,15 @@ const mapStateToProps = (state) => {
     players: state.connectionReducer.players,
     deck: state.gameReducer.deck,
     player: state.playerReducer,
+    activePlayer: state.gameReducer.activePlayer,
   }
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    nextTurn: (() => dispatch({type: 'nextTurn'})),
+    endTurn: (() => dispatch({type: 'endTurn'})),
+    updateCoins: ((amt) => dispatch({type: 'updateCoins', amt: amt})),
+    updateTreasury: ((amt) => dispatch({type: 'updateTreasury', amt: amt})),
   }
 }
 

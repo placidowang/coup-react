@@ -1,6 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux'
 import Player from '../containers/Player.js'
+import OpponentsContainer from '../containers/OpponentsContainer.js'
+import './Game.css'
 
 class Game extends React.Component {
   componentDidMount(){
@@ -18,14 +20,17 @@ class Game extends React.Component {
           case 'updateDeck':
             this.props.updateDeck(msg.message.updatedDeck)
             break
+          case 'updatePlayer':
+            this.props.updatePlayer(msg.message.player)
+            break
           case 'addCardsToHand':
             this.props.setActivePlayer()
             if (msg.message.playerId === this.props.player.id) {
               this.props.addCardsToHand(msg.message.cards)
             }
             break
-          case 'nextTurn':
-            this.props.nextTurn()
+          case 'endTurn':
+            this.props.endTurn()
             console.log(this.props.whosTurnIsIt)
             this.props.setActivePlayer()
             break
@@ -39,7 +44,8 @@ class Game extends React.Component {
       })
     // }
 
-    // when there is a new activePlayer message, do I need to toggle myTurn?
+    this.props.updateTreasury(-(this.props.players.length * 2))
+    // when there is a new activePlayer message, do I need to toggle myTurn? -so far no
   }
   
   componentDidUpdate() {
@@ -98,13 +104,14 @@ class Game extends React.Component {
   // }
 
   // need this in case players aren't automatically synced, which they probably won't be
-  updatePlayers = (players) => {
+  // currently being used in Player.js
+  updatePlayer = () => {
 
   }
 
-  nextTurn = () => {
+  endTurn = () => {
     this.props.pubnub.publish({
-      message: { type: 'nextTurn' },
+      message: { type: 'endTurn' },
       channel: this.props.gameChannel
     })
   }
@@ -120,7 +127,7 @@ class Game extends React.Component {
 
   hereNow = () => {
     this.props.pubnub.hereNow({
-      channel: this.props.gameChannel
+      channels: [this.props.gameChannel]
     })
     .then(console.log)
   }
@@ -131,18 +138,20 @@ class Game extends React.Component {
 
   render() {
     return (
-      <div>
+      <div className='game'>
+        <OpponentsContainer />
         <p>Deck: {this.props.deck.map(card => card.name).join(', ')}</p>
+        <p>Treasury: {this.props.treasury} coins</p>
 
         <button onClick={()=>this.shuffleDeck()}>Shuffle Deck</button>
-        <button onClick={() => this.testMsg('GAME YO')}>message</button>
-        <button onClick={this.hereNow}>who here</button>
-        <button onClick={this.logPlayers}>Players</button>
-        <br/><button onClick={this.nextTurn}>End Turn</button>
+        {/* <button onClick={() => this.testMsg('GAME YO')}>message</button> */}
+        <button onClick={this.hereNow}>log who's here</button>
+        <button onClick={this.logPlayers}>log players</button>
+        <br/><button onClick={this.endTurn}>End Turn</button>
 
         <p>Whose turn: {this.props.activePlayer.username ? this.props.activePlayer.username : null}</p>
 
-        <p style={{fontSize: '20px'}}>Players: {this.props.players.map(player => player.username).join(', ')}</p>
+        {/* <p style={{fontSize: '20px'}}>Players: {this.props.players.map(player => player.username).join(', ')}</p> */}
         <Player />
       </div>
     );
@@ -157,6 +166,7 @@ const mapStateToProps = (state) => {
     player: state.playerReducer,
     players: state.gameReducer.players,
     deck: state.gameReducer.deck,
+    treasury: state.gameReducer.treasury,
     whosTurnIsIt: state.gameReducer.whosTurnIsIt,
     activePlayer: state.gameReducer.activePlayer,
   }
@@ -166,10 +176,12 @@ const mapDispatchToProps = (dispatch) => {
   return {
     initDeck: ((cards) => dispatch({type: 'initializeDeck', cards: cards})),
     updateDeck: ((deck) => dispatch({type: 'updateDeck', updatedDeck: deck})),
+    updatePlayer: ((player) => dispatch({type: 'updatePlayer', player: player})),
     // drawCard: ((card) => dispatch({type: 'drawCard', card: card})),
     addCardsToHand: ((cards) => dispatch({type: 'addCardsToHand', cards: cards})),
+    updateTreasury: ((amt) => dispatch({type: 'updateTreasury', amt: amt})),
     setActivePlayer: (() => dispatch({type: 'setActivePlayer'})),
-    nextTurn: (() => dispatch({type: 'nextTurn'})),
+    endTurn: (() => dispatch({type: 'endTurn'})),
   }
 }
 

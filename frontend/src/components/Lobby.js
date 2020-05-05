@@ -49,14 +49,14 @@ class Lobby extends React.Component {
   }
 
   joinLobby = (e) => {
-    console.log('You are not the host.')
     e.preventDefault()
     const roomId = e.target[0].value.toUpperCase()
-
+    
     // check if there's already 5 players:
     this.props.pubnub.hereNow({channels: [`coup-lobby-${roomId}`]})
     .then(channel => {
       if (channel.totalOccupancy < 5) {
+        console.log('You are not the host.')
         this.subscribeToLobby(roomId)
       } else {
         console.error('Room is full!')
@@ -89,7 +89,6 @@ class Lobby extends React.Component {
   addToPlayers = (player) => {
     this.props.addToPlayers(player)
     // console.log(this.props.players)
-    this.setState({}) // necessary to rerender playerlist? why not just updating reducer? is it because it's pushing player into array?
     this.props.pubnub.publish({
       message: {
         type: 'updatePlayers',
@@ -117,7 +116,6 @@ class Lobby extends React.Component {
         message: { type: 'startGame' },
         channel: this.props.lobbyChannel
       })
-
     }
   }
 

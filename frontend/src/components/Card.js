@@ -10,6 +10,7 @@ class Card extends React.Component {
         <img className='portrait' src={`./images/${this.props.card.name.toLowerCase()}.png`} alt={this.props.card.name} />
         <div className='card-info'>
           {/* <h3>{this.props.card.action}</h3> */}
+          {/* <h3>{this.props.card.effect}</h3> */}
           <p>{this.props.card.description}</p>
         </div>
       </div>
