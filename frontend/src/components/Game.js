@@ -44,10 +44,9 @@ class Game extends React.Component {
           case 'alert':
             if (this.props.player.id !== msg.message.fromPlayerId) {
               // alert(msg.message.message)
-              let timerInterval
+              // let timerInterval
               Swal.fire({
-                title: 'Oh SHIT.',
-                text: msg.message.message,
+                title: `Oh SHIT, ${msg.message.message}`,
                 timer: 5000,
                 timerProgressBar: true,
                 showCancelButton: true,
@@ -57,7 +56,7 @@ class Game extends React.Component {
                 html: "<span class='swal2-text'><b></b></span>",
                 onBeforeOpen: () => {
                   // Swal.showLoading()
-                  timerInterval = setInterval(() => {
+                  setInterval(() => {
                     const content = Swal.getContent()
                     if (content) {
                       const b = content.querySelector('b')
