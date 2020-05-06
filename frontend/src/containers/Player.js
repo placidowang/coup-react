@@ -32,7 +32,7 @@ class Player extends React.Component {
         break
       case 'Foreign Aid':
         if (this.props.treasury >= 2) {
-          this.alertPlayers(`Oh SHIT, ${this.props.player.username} is trying to Foreign Aid!!!`)
+          this.alertPlayers(`${this.props.player.username} is trying to Foreign Aid!!!`)
           this.updateCoins(2)
           this.updateTreasury(-2)
           this.endTurn()

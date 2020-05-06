@@ -1,4 +1,5 @@
 import React from 'react';
+import Swal from 'sweetalert2/dist/sweetalert2.js'
 import { connect } from 'react-redux'
 import Player from '../containers/Player.js'
 import OpponentsContainer from '../containers/OpponentsContainer.js'
@@ -42,10 +43,84 @@ class Game extends React.Component {
             break
           case 'alert':
             if (this.props.player.id !== msg.message.fromPlayerId) {
-              alert(msg.message.message)
+              // alert(msg.message.message)
+              let timerInterval
+              Swal.fire({
+                title: 'Oh SHIT.',
+                text: msg.message.message,
+                timer: 5000,
+                timerProgressBar: true,
+                showCancelButton: true,
+                // cancelButtonColor: '#B0B0B0',
+                cancelButtonText: 'Let him get away with it... this time',
+                confirmButtonText: 'CHALLENGE the bastard.',
+                html: "<span class='swal2-text'><b></b></span>",
+                onBeforeOpen: () => {
+                  // Swal.showLoading()
+                  timerInterval = setInterval(() => {
+                    const content = Swal.getContent()
+                    if (content) {
+                      const b = content.querySelector('b')
+                      // if (b) {
+                      if (b && Swal.getTimerLeft()) {
+                        const timeLeft = Swal.getTimerLeft() >= 1000
+                          ? parseInt(Swal.getTimerLeft().toString().slice(0,1)) + 1
+                          : 1
+                        b.textContent = timeLeft
+                        // b.textContent = Swal.getTimerLeft()
+                      }
+                    }
+                  }, 100)
+                },
+                // onClose: () => {
+                //   clearInterval(timerInterval)
+                // }
+              })
+              .then(r => {
+                if (r.value) {
+                  console.log('send challenge to: ' + msg.message.fromPlayerId)
+                  this.props.pubnub.publish({
+                    message: {
+                      type: 'challenge',
+                      challengedPlayerId: msg.message.fromPlayerId,
+                      challengerPlayerId: this.props.player.id
+                    },
+                    channel: this.props.gameChannel
+                  })
+                } else {
+                  console.log("Where's your honor??")
+                }
+              })
             } else {
-              alert('Waiting for other players.')
+              Swal.fire({
+                title: 'Waiting for other players.',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                timer: 5000,
+                timerProgressBar: true,
+              })
             }
+            break
+          case 'challenge':
+            // console.log(this.props.player.id)
+            // console.log(msg)
+            // console.log(msg.message.challengedPlayerId + ' has been challenged!')
+            if (this.props.player.id === msg.message.challengedPlayerId) {
+              Swal.close()
+              Swal.fire({
+                title: "You've been challenged!!",
+                showCancelButton: true,
+                cancelButtonText: 'Back down',
+                confirmButtonText: 'Oh YEAH??'
+              })
+            } else if (this.props.player.id === msg.message.challengerPlayerId) {
+              console.log("You have challenged the player!")
+              Swal.fire('You have challenged the player!')
+            } else {
+              console.log("Player has been challenged.")
+              Swal.close()
+            }
+            break
           case 'log':
             console.log(msg.message.text)
             break
@@ -56,8 +131,8 @@ class Game extends React.Component {
       })
     // }
 
+    // initiate treasury for every player
     this.props.changeTreasury(-(this.props.players.length * 2))
-    // when there is a new activePlayer message, do I need to toggle myTurn? -so far no
   }
   
   componentDidUpdate() {

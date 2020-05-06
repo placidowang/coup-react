@@ -1,7 +1,7 @@
 const initialState = {
   id: NaN,
-  username: Math.random().toString(36).slice(2,5),
-  // username: '',
+  // username: Math.random().toString(36).slice(2,5),
+  username: '',
   hand: [],
   coins: 2,
   // actions: ['Income', 'Foreign Aid', 'Coup', 'Tax', 'Assassinate', 'Exchange', 'Steal'],
@@ -39,7 +39,7 @@ const initialState = {
       effect: null,
       counteraction: 'Blocks assassination'}
   },
-  myTurn: false,
+  // myTurn: false, // unnecessary so far, just check if props.player.id === props.activePlayer.id
 }
 
 export default function playerReducer(state = initialState, action) {

@@ -11,4 +11,16 @@ class Asdf extends React.Component {
   }
 }
 
-export default connect()(Asdf)
+const mapStateToProps = (state) => {
+  return {
+
+  }
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Asdf)

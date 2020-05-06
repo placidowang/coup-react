@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import Swal from 'sweetalert2'
 
 class Lobby extends React.Component {
   componentDidMount() {
@@ -11,6 +12,7 @@ class Lobby extends React.Component {
       this.props.pubnub.getMessage(this.props.lobbyChannel, (msg) => {
         switch (msg.message.type) {
           case 'startGame':
+            Swal.close()
             this.playGame()
             break
           case 'log':
@@ -55,11 +57,15 @@ class Lobby extends React.Component {
     // check if there's already 5 players:
     this.props.pubnub.hereNow({channels: [`coup-lobby-${roomId}`]})
     .then(channel => {
-      if (channel.totalOccupancy < 5) {
+      if (channel.totalOccupancy === 0) {
+        console.error("Room doesn't exist!")
+        Swal.fire("Room doesn't exist!")
+      } else if (channel.totalOccupancy < 5) {
         console.log('You are not the host.')
         this.subscribeToLobby(roomId)
       } else {
         console.error('Room is full!')
+        Swal.fire('Room is full!')
       }
     })
   }
@@ -108,7 +114,8 @@ class Lobby extends React.Component {
   startGame = () => {
     if (!this.props.isHost) {
       console.log('You are NOT the host!!')
-      return
+      Swal.fire('Please wait for the host to start the game.')
+      // return
     } else {
       console.log('Starting game')
 
