@@ -4,12 +4,17 @@ import Opponent from '../components/Opponent.js'
 import './Opponents.css'
 
 class OpponentsContainer extends React.Component {
+
+
   render() {
     const opponents = this.props.players.filter(player => player.id !== this.props.player.id)
     return(
       <div className='opponents-container'>
         <p>Opponents</p>
-        {opponents.map(opponent => <Opponent key={opponent.id} opponent={opponent} />)}
+        {opponents.map(opponent =>
+
+            <Opponent key={opponent.id} opponent={opponent} />
+        )}
       </div>
     )
   }

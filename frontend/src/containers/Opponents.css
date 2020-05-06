@@ -17,3 +17,7 @@
   font-size: 20px;
   margin: 0px;
 }
+
+.opponent p.opponent-name {
+  color: red;
+}

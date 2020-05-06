@@ -40,6 +40,12 @@ class Game extends React.Component {
             console.log(this.props.whosTurnIsIt)
             this.props.setActivePlayer()
             break
+          case 'alert':
+            if (this.props.player.id !== msg.message.fromPlayerId) {
+              alert(msg.message.message)
+            } else {
+              alert('Waiting for other players.')
+            }
           case 'log':
             console.log(msg.message.text)
             break

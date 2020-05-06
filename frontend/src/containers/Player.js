@@ -21,13 +21,38 @@ class Player extends React.Component {
     console.log(action)
     switch (action) {
       case 'Income':
-        this.updateCoins(1)
-        this.endTurn()
+        if (this.props.treasury >= 1) {
+          this.updateCoins(1)
+          // await this.props.changeTreasury(-amt)
+          this.updateTreasury(-1)
+          this.endTurn()
+        } else {
+          console.error('Not enough coins in Treasury')
+        }
         break
       case 'Foreign Aid':
-        this.updateCoins(2)
-        this.endTurn()
+        if (this.props.treasury >= 2) {
+          this.alertPlayers(`Oh SHIT, ${this.props.player.username} is trying to Foreign Aid!!!`)
+          this.updateCoins(2)
+          this.updateTreasury(-2)
+          this.endTurn()
+        } else {
+          console.error('Not enough coins in Treasury')
+        }
         break
+      case 'Tax':
+        if (this.props.treasury >= 3) {
+          this.updateCoins(3)
+          this.updateTreasury(-3)
+          this.endTurn()
+        } else {
+          console.error('Not enough coins in Treasury')
+        }
+        break
+      case 'Coup':
+        this.targetPlayer()
+        break
+
       default:
         console.error('Invalid player action')
     }
@@ -44,12 +69,12 @@ class Player extends React.Component {
     })
   }
 
-  updateTreasury = () => {
+  updateTreasury = (amt) => {
     // console.log(this.props.treasury)
     this.props.pubnub.publish({
       message: {
         type: 'updateTreasury',
-        treasury: this.props.treasury
+        treasury: this.props.treasury + amt
       },
       channel: this.props.gameChannel
     })
@@ -58,8 +83,21 @@ class Player extends React.Component {
   updateCoins = async(amt) => {
     await this.props.updateCoins(amt)
     this.updatePlayer()
-    await this.props.changeTreasury(-amt)
-    this.updateTreasury()
+  }
+
+  targetPlayer = () => {
+
+  }
+
+  alertPlayers = (msg) => {
+    this.props.pubnub.publish({
+      message: {
+        type: 'alert',
+        fromPlayerId: this.props.player.id,
+        message: msg
+      },
+      channel: this.props.gameChannel
+    })
   }
 
   endTurn = () => {
