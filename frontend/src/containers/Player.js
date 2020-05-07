@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import './Player.css'
 import Card from '../components/Card.js'
+import Swal from 'sweetalert2'
 
 class Player extends React.Component {
   componentDidMount() {
@@ -12,7 +13,7 @@ class Player extends React.Component {
     // console.log(this.props.player)
   }
 
-  yourTurn = () => {
+  isYourTurn = () => {
     return (this.props.activePlayer.id === this.props.player.id)
   }
 
@@ -27,16 +28,18 @@ class Player extends React.Component {
           this.updateTreasury(-1)
           this.endTurn()
         } else {
+          Swal.fire('Not enough coins in Treasury!')
           console.error('Not enough coins in Treasury')
         }
         break
       case 'Foreign Aid':
         if (this.props.treasury >= 2) {
-          this.alertPlayers(`${this.props.player.username} is trying to use Foreign Aid!!!`)
-          this.updateCoins(2)
-          this.updateTreasury(-2)
-          this.endTurn()
+          this.alertPlayers(action, undefined, 'Duke')
+          // this.updateCoins(2)
+          // this.updateTreasury(-2)
+          // this.endTurn()
         } else {
+          Swal.fire('Not enough coins in Treasury!')
           console.error('Not enough coins in Treasury')
         }
         break
@@ -46,6 +49,7 @@ class Player extends React.Component {
           this.updateTreasury(-3)
           this.endTurn()
         } else {
+          Swal.fire('Not enough coins in Treasury!')
           console.error('Not enough coins in Treasury')
         }
         break
@@ -89,12 +93,15 @@ class Player extends React.Component {
 
   }
 
-  alertPlayers = (msg) => {
+  alertPlayers = (action, associatedCard, counterCard) => {
     this.props.pubnub.publish({
       message: {
         type: 'alert',
-        fromPlayerId: this.props.player.id,
-        message: msg
+        // fromPlayer: this.props.player,
+        action: action,
+        // message: msg,
+        associatedCard: associatedCard,
+        counterCard: counterCard,
       },
       channel: this.props.gameChannel
     })
@@ -121,7 +128,7 @@ class Player extends React.Component {
             <p className='coins'>Coins: {player.coins}</p>
           </div>
           <div className='hand-container'>
-            <p>Hand </p>
+            <p>Hand</p>
             <div className='hand'>
               {player.hand.map(card => <Card key={card.id} card={card} />)}
             </div>
@@ -130,7 +137,7 @@ class Player extends React.Component {
         <div className='actions'>Actions: 
           {actions.map(action => 
             <div className='actions' key={action.action}>
-              <button onClick={e => this.takeAction(e.target.value)} value={action.action} disabled={this.yourTurn() ? '' : 'disabled'}>{action.action}</button>
+              <button onClick={e => this.takeAction(e.target.value)} value={action.action} disabled={this.isYourTurn() ? '' : 'disabled'}>{action.action}</button>
             </div>
           )}
         </div>

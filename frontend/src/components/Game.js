@@ -1,9 +1,11 @@
 import React from 'react';
-import Swal from 'sweetalert2/dist/sweetalert2.js'
+import Swal from 'sweetalert2'
 import { connect } from 'react-redux'
 import Player from '../containers/Player.js'
 import OpponentsContainer from '../containers/OpponentsContainer.js'
 import './Game.css'
+
+const globalSwalTimer = 10000
 
 class Game extends React.Component {
   componentDidMount(){
@@ -37,67 +39,186 @@ class Game extends React.Component {
             }
             break
           case 'endTurn':
+            // Swal.close()
             this.props.endTurn()
             console.log(this.props.whosTurnIsIt)
             this.props.setActivePlayer()
             break
           case 'alert':
-            if (this.props.player.id !== msg.message.fromPlayerId) {
-              // alert(msg.message.message)
-              // let timerInterval
-              Swal.fire({
-                title: `Oh SHIT, ${msg.message.message}`,
-                timer: 5000,
-                timerProgressBar: true,
-                showCancelButton: true,
-                // cancelButtonColor: '#B0B0B0',
-                cancelButtonText: 'Let him get away with it... this time',
-                confirmButtonText: 'CHALLENGE the bastard.',
-                html: "<span class='swal2-text'><b></b></span>",
-                onBeforeOpen: () => {
-                  // Swal.showLoading()
-                  setInterval(() => {
-                    const content = Swal.getContent()
-                    if (content) {
-                      const b = content.querySelector('b')
-                      // if (b) {
-                      if (b && Swal.getTimerLeft()) {
-                        const timeLeft = Swal.getTimerLeft() >= 1000
-                          ? parseInt(Swal.getTimerLeft().toString().slice(0,1)) + 1
-                          : 1
-                        b.textContent = timeLeft
-                        // b.textContent = Swal.getTimerLeft()
+            if (!this.isYourTurn()) {
+              if (!msg.message.associatedCard && msg.message.counterCard) {
+                Swal.fire({
+                  title: `${this.props.activePlayer.username} is trying to use ${msg.message.action}!`,
+                  timer: globalSwalTimer,
+                  timerProgressBar: true,
+                  showCancelButton: true,
+                  cancelButtonText: `Let ${this.props.activePlayer.username} use ${msg.message.action}... this time.`,
+                  confirmButtonText: `BLOCK ${this.props.activePlayer.username} with a ${msg.message.counterCard}.`,
+                  html: `<span class='swal2-text'>Letting ${this.props.activePlayer.username} use ${msg.message.action} in <b></b></span>`,
+                  onBeforeOpen: () => {
+                    setInterval(() => {
+                      const content = Swal.getContent()
+                      if (content) {
+                        const b = content.querySelector('b')
+                        if (b && Swal.getTimerLeft()) {
+                          b.textContent = Math.ceil(Swal.getTimerLeft() / 1000)
+                        }
                       }
-                    }
-                  }, 100)
-                },
-                // onClose: () => {
-                //   clearInterval(timerInterval)
-                // }
-              })
-              .then(r => {
-                if (r.value) {
-                  console.log('send challenge to: ' + msg.message.fromPlayerId)
-                  this.props.pubnub.publish({
-                    message: {
-                      type: 'challenge',
-                      challengedPlayerId: msg.message.fromPlayerId,
-                      challengerPlayerId: this.props.player.id
-                    },
-                    channel: this.props.gameChannel
-                  })
-                } else {
-                  console.log("Where's your honor??")
-                }
-              })
+                    }, 100)
+                  }
+                })
+                .then(r => {
+                  if (r.value) {
+                    this.props.pubnub.publish({
+                      message: {
+                        type: 'counter',
+                        action: msg.message.action,
+                        counterCard: msg.message.counterCard,
+                        counteredPlayerId: this.props.activePlayer.id,
+                        counteredPlayerUn: this.props.activePlayer.username,
+                        counteringPlayerId: this.props.player.id,
+                        counteringPlayerUn: this.props.player.username,
+                      },
+                      channel: this.props.gameChannel
+                    })
+                  } else {
+                    console.log("Letting it slide")
+                  }
+                })
+              }
+              // include buttons to counter OR challenge
+              else if (msg.message.associatedCard && msg.message.counterCard) {
+                Swal.fire({
+                  title: `Oh SHIT, ${this.props.activePlayer.username} is trying to use ${msg.message.action}!!!`,
+                  showCancelButton: true,
+                  timer: globalSwalTimer,
+                  timerProgressBar: true,
+                  // cancelButtonColor: '#B0B0B0',
+                  cancelButtonText: 'Let him get away with it... this time',
+                  confirmButtonText: `COUNTER the bastard with my ${msg.message.counterCard}.`,
+                  allowOutsideClick: false,
+                  html: "<span class='swal2-text'><b></b></span>",
+                  onBeforeOpen: () => {
+                    setInterval(() => {
+                      const content = Swal.getContent()
+                      if (content) {
+                        const b = content.querySelector('b')
+                        if (b && Swal.getTimerLeft()) {
+                          b.textContent = Math.ceil(Swal.getTimerLeft() / 1000)
+                        }
+                      }
+                    }, 100)
+                  }
+                })
+                .then(r => {
+                  // console.log(msg.message.counterCard)
+                  if (r.value) {
+                    this.props.pubnub.publish({
+                      message: {
+                        type: 'counter',
+                        counteredPlayerId: this.props.activePlayer.id,
+                        counteringPlayerId: this.props.player.id,
+                        counterCard: msg.message.counterCard
+                      },
+                      channel: this.props.gameChannel
+                    })
+                  } else {
+                    console.log("Letting it slide")
+                  }
+                })
+              }
             } else {
               Swal.fire({
                 title: 'Waiting for other players.',
                 allowOutsideClick: false,
                 showConfirmButton: false,
-                timer: 5000,
+                timer: globalSwalTimer,
                 timerProgressBar: true,
               })
+              .then(r => {
+                if (r.dismiss === 'timer') {
+                  Swal.fire({
+                    title: `You used ${msg.message.action}!`,
+                    showConfirmButton: false,
+                    timer: 1500,
+                    icon: 'success'
+                  })
+                  // case switch reward depending on action
+                  this.updateCoins(2)
+                  this.updateTreasury(-2)
+                  this.endTurn()
+                }
+              })
+              
+            }
+            break
+          case 'counter':
+            if (this.props.player.id === msg.message.counteredPlayerId) {
+              Swal.close()
+              Swal.fire({
+                title: `${msg.message.counteringPlayerUn} is trying to BLOCK your ${msg.message.action} with a ${msg.message.counterCard}!`,
+                showCancelButton: true,
+                cancelButtonText: 'Back down',
+                confirmButtonText: 'CHALLENGE',
+                allowOutsideClick: false,
+                timer: globalSwalTimer,
+                timerProgressBar: true,
+                html: "<span class='swal2-text'>Backing down in <b></b></span>",
+                onBeforeOpen: () => {
+                  setInterval(() => {
+                    const content = Swal.getContent()
+                    if (content) {
+                      const b = content.querySelector('b')
+                      if (b && Swal.getTimerLeft()) {
+                        b.textContent = Math.ceil(Swal.getTimerLeft() / 1000)
+                      }
+                    }
+                  }, 100)
+                }
+              })
+              .then(r => {
+                if (r.value) {
+                  console.log('send challenge to: ' + this.props.activePlayer)
+                  this.props.pubnub.publish({
+                    message: {
+                      type: 'challenge',
+                      challengedPlayerId: msg.message.counteringPlayerId,
+                      challengedPlayerUn: msg.message.counteringPlayerUn,
+                      challengingPlayerId: this.props.player.id,
+                      challengingPlayerUn: this.props.player.username,
+                      challengedCard: msg.message.counterCard
+                    },
+                    channel: this.props.gameChannel
+                  })
+                } else if (r.dismiss) {
+                  console.log("Where's your honor??")
+                  this.endTurn()
+                }
+              })
+            } else if (this.props.player.id === msg.message.counteringPlayerId) {
+              console.log(`You have attempted to block ${msg.message.counteredPlayerUn}'s ${msg.message.action}!`)
+              Swal.fire({
+                title: `You have attempted to block ${msg.message.counteredPlayerUn}'s ${msg.message.action}!`,
+                timer: globalSwalTimer,
+                timerProgressBar: true,
+                allowOutsideClick: false,
+                showConfirmButton: false,
+              })
+              .then(r => {
+                if (r.dismiss === 'timer') {
+                  Swal.fire({
+                    title: `You blocked ${msg.message.counteredPlayerUn}'s ${msg.message.action}!`,
+                    icon: 'success',
+                    timer: 1500,
+                    timerProgressBar: true,
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                  })
+                }
+              })
+            } else {
+              console.log(`${msg.message.counteringPlayerUn} has attempted to block ${msg.message.counteredPlayerUn}.`)
+              Swal.close()
             }
             break
           case 'challenge':
@@ -106,17 +227,42 @@ class Game extends React.Component {
             // console.log(msg.message.challengedPlayerId + ' has been challenged!')
             if (this.props.player.id === msg.message.challengedPlayerId) {
               Swal.close()
+              const challengedCard = this.props.player.hand.find(card => card.name === msg.message.challengedCard)
+              if (challengedCard && !challengedCard.revealed) {
+                Swal.fire({
+                  title: `${msg.message.challengingPlayerUn} challenged you!`,
+                  showCancelButton: true,
+                  cancelButtonText: "Lose a card (Hint: don't do this)",
+                  confirmButtonText: `Show my ${msg.message.challengedCard}.`
+                })
+                .then(r => console.log(r))
+              } else {
+                Swal.fire({
+                  title: `You were called out! :(`,
+                  // footer: 'fuck',
+                })
+              }
+            } else if (this.props.player.id === msg.message.challengingPlayerId) {
+              console.log(`You challenged ${msg.message.challengedPlayerUn}'s ${msg.message.challengedCard}!`)
               Swal.fire({
-                title: "You've been challenged!!",
-                showCancelButton: true,
-                cancelButtonText: 'Back down',
-                confirmButtonText: 'Oh YEAH??'
+                title: `You challenged ${msg.message.challengedPlayerUn}'s ${msg.message.challengedCard}!`,
+                showConfirmButton: false,
+                // timer: globalSwalTimer,
+                // timerProgressBar: true,
               })
-            } else if (this.props.player.id === msg.message.challengerPlayerId) {
-              console.log("You have challenged the player!")
-              Swal.fire('You have challenged the player!')
+              .then(r => {
+                console.log(r)
+                if (r.dismiss === 'timer') {
+                  Swal.fire({
+                    title: `${msg.message.challengedPlayerUn} lost a card!`,
+                    showConfirmButton: false,
+                    timer: 1500,
+                    icon: 'success'
+                  })
+                }
+              })
             } else {
-              console.log("Player has been challenged.")
+              console.log(`${msg.message.challengedPlayerUn} has been challenged by ${msg.message.challengingPlayerUn}.`)
               Swal.close()
             }
             break
@@ -138,7 +284,7 @@ class Game extends React.Component {
     // console.log(this.props.deck)
 
   }
-
+  
   initializeGame = (deckData) => {
     const deck = deckData.cards.map(card => ({...card, isRevealed: false}))
     const shuffledDeck = this.shuffleDeck(deck)
@@ -188,11 +334,37 @@ class Game extends React.Component {
   //   this.props.drawCard(card)
   //   this.props.removeCardFromDeck()
   // }
+  
+  isYourTurn = () => {
+    return (this.props.activePlayer.id === this.props.player.id)
+  }
 
   // need this in case players aren't automatically synced, which they probably won't be
-  // currently being used in Player.js
   updatePlayer = () => {
+    // console.log(this.props.player.coins + 'coins')
+    this.props.pubnub.publish({
+      message: {
+        type: 'updatePlayer',
+        player: this.props.player
+      },
+      channel: this.props.gameChannel
+    })
+  }
 
+  updateTreasury = (amt) => {
+    // console.log(this.props.treasury)
+    this.props.pubnub.publish({
+      message: {
+        type: 'updateTreasury',
+        treasury: this.props.treasury + amt
+      },
+      channel: this.props.gameChannel
+    })
+  }
+
+  updateCoins = async(amt) => {
+    await this.props.updateCoins(amt)
+    this.updatePlayer()
   }
 
   endTurn = () => {
@@ -202,8 +374,16 @@ class Game extends React.Component {
     })
   }
 
+  // pick card to reveal
+  loseCard = () => {
 
-  
+  }
+
+  // choose card to reveal, reveal on timer(?), shuffle into deck and draw a new card
+  revealCard = () => {
+
+  }
+
   testMsg = (msg) => {
     this.props.pubnub.publish({
       message: {type: 'log', text: msg},
@@ -226,16 +406,16 @@ class Game extends React.Component {
     return (
       <div className='game'>
         <OpponentsContainer />
-        <p>Deck: {this.props.deck.map(card => card.name).join(', ')}</p>
+        <p className='whose-turn'>Whose turn: {this.props.activePlayer.username ? this.props.activePlayer.username : null}</p>
         <p>Treasury: {this.props.treasury} coins</p>
 
-        <button onClick={()=>this.shuffleDeck()}>Shuffle Deck</button>
+        <p>Court Deck: {this.props.deck.length} cards</p>
+        {/* <p>Deck: {this.props.deck.map(card => card.name).join(', ')}</p> */}
+        {/* <button onClick={()=>this.shuffleDeck()}>Shuffle Deck</button> */}
         {/* <button onClick={() => this.testMsg('GAME YO')}>message</button> */}
-        <button onClick={this.hereNow}>log who's here</button>
-        <button onClick={this.logPlayers}>log players</button>
+        {/* <button onClick={this.hereNow}>log who's here</button> */}
+        {/* <button onClick={this.logPlayers}>log players</button> */}
         <br/><button onClick={this.endTurn}>End Turn</button>
-
-        <p>Whose turn: {this.props.activePlayer.username ? this.props.activePlayer.username : null}</p>
 
         {/* <p style={{fontSize: '20px'}}>Players: {this.props.players.map(player => player.username).join(', ')}</p> */}
         <Player />
@@ -266,6 +446,7 @@ const mapDispatchToProps = (dispatch) => {
     // drawCard: ((card) => dispatch({type: 'drawCard', card: card})),
     addCardsToHand: ((cards) => dispatch({type: 'addCardsToHand', cards: cards})),
     changeTreasury: ((amt) => dispatch({type: 'changeTreasury', amt: amt})),
+    updateCoins: ((amt) => dispatch({type: 'updateCoins', amt: amt})),
     updateTreasury: ((treasury) => dispatch({type: 'updateTreasury', treasury: treasury})),
     setActivePlayer: (() => dispatch({type: 'setActivePlayer'})),
     endTurn: (() => dispatch({type: 'endTurn'})),

@@ -35,7 +35,7 @@ class Lobby extends React.Component {
 
   createLobby = () => {
     console.log('You are the host!')
-    const roomId = Math.random().toString(36).slice(2,7).toUpperCase()
+    const roomId = Math.random().toString(36).slice(2,6).toUpperCase()
 
     // try again if roomId already exists
     this.props.pubnub.hereNow({channels: [`coup-lobby-${roomId}`]})
@@ -53,8 +53,11 @@ class Lobby extends React.Component {
   joinLobby = (e) => {
     e.preventDefault()
     const roomId = e.target[0].value.toUpperCase()
-    
-    // check if there's already 5 players:
+    if (roomId.length === 0) {
+      Swal.fire('Please enter a Room ID')
+      return
+    }
+
     this.props.pubnub.hereNow({channels: [`coup-lobby-${roomId}`]})
     .then(channel => {
       if (channel.totalOccupancy === 0) {
@@ -166,11 +169,11 @@ class Lobby extends React.Component {
 
         {!this.props.lobbyChannel &&
           <div>
-            <button onClick={this.createLobby} className='createLobby'>Create Lobby</button>
+            <button onClick={this.createLobby} className='createLobby'>Create Room</button>
 
             <form onSubmit={(e)=>this.joinLobby(e)}>
-              <input type='text' placeholder='Enter Lobby ID'/>
-              <button type='submit'>Join Lobby</button>
+              <input type='text' placeholder='Enter Room ID'/>
+              <button type='submit'>Join Room</button>
             </form>
 
           </div>

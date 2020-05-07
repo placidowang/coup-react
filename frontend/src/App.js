@@ -9,6 +9,7 @@ import "typeface-roboto";
 import "typeface-muli"
 
 import GameContainer from './containers/GameContainer.js'
+import Swal from 'sweetalert2';
 
 class App extends React.Component {
   constructor(props) {
@@ -40,7 +41,8 @@ class App extends React.Component {
     if (username !== "") {
       this.props.setUsername(username)
     } else {
-      console.error('Please enter a username.')
+      Swal.fire('Please enter a username!')
+      console.error('Please enter a username!')
     }
   }
 
@@ -49,11 +51,11 @@ class App extends React.Component {
       <div className="App">
         {!this.props.username && 
           <div>
-            <p className='title'>sup, time for some damn COUP</p>
-            <p>Enter name to play</p>
+            <p className='title'>COUP REACT</p>
+            <p style={{fontSize: '24px'}}>Enter name to play</p>
             <form onSubmit={e => this.setUsername(e)}>
-              <input type='text'/>
-              <button type='submit'>Set Username</button>
+              <input type='text' placeholder='Set Username'/>
+              <button type='submit'>Let's go!</button>
             </form>
           </div>
         }
@@ -61,17 +63,6 @@ class App extends React.Component {
         {this.props.username &&
           <GameContainer />
         }
-
-        {/* <BrowserRouter>
-          <div className="App">
-            <Switch>
-              <GameContainer />
-              <Route path='/test'>
-                <p>testing testing yoyoyo</p>
-              </Route>
-            </Switch>
-          </div>
-        </BrowserRouter> */}
       </div>
     )
   }

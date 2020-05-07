@@ -15,8 +15,13 @@
   font-family: 'muli';
 }
 
+.swal2-footer {
+  font-family: 'muli';
+}
+
 .title {
   color: rgb(255, 0, 0);
+  font-size: 50px;
 }
 
 input {

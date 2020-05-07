@@ -10,11 +10,12 @@ class OpponentsContainer extends React.Component {
     const opponents = this.props.players.filter(player => player.id !== this.props.player.id)
     return(
       <div className='opponents-container'>
-        <p>Opponents</p>
-        {opponents.map(opponent =>
-
-            <Opponent key={opponent.id} opponent={opponent} />
-        )}
+        <p className='opponents-title'>Opponents</p>
+        <div className='opponents'>
+          {opponents.map(opponent =>
+              <Opponent key={opponent.id} opponent={opponent} />
+          )}
+        </div>
       </div>
     )
   }
