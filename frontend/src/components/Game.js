@@ -152,12 +152,14 @@ class Game extends React.Component {
                       challengedPlayerUn: msg.message.counteringPlayerUn,
                       challengingPlayerId: this.props.player.id,
                       challengingPlayerUn: this.props.player.username,
-                      challengedCard: msg.message.counterCard
+                      challengedCard: msg.message.counterCard,
+                      action: msg.message.action,
                     },
                     channel: this.props.gameChannel
                   })
                 } else if (r.dismiss) {
                   console.log("Where's your honor??")
+                  // send message that blocker won, close swal
                   this.endTurn()
                 }
               })
@@ -197,25 +199,60 @@ class Game extends React.Component {
                 Swal.fire({
                   title: `${msg.message.challengingPlayerUn} challenged you!`,
                   showCancelButton: true,
+                  confirmButtonText: `Show my ${msg.message.challengedCard}.`,
                   cancelButtonText: "Lose a card (Hint: don't do this)",
-                  confirmButtonText: `Show my ${msg.message.challengedCard}.`
                 })
                 .then(r => {
                   if (r.value) {
-                    this.showCard(msg.message.challengedCard)
+                    this.props.pubnub.publish({
+                      message: {
+                        type: 'challengedPlayerWon',
+                        challengedPlayerId: msg.message.challengedPlayerId,
+                        challengedPlayerUn: msg.message.challengedPlayerUn,
+                        challengingPlayerId: msg.message.challengingPlayerId,
+                        challengingPlayerUn: msg.message.challengingPlayerUn,
+                        challengedCard: msg.message.challengedCard,
+                        action: msg.message.action,
+                      },
+                      channel: this.props.gameChannel
+                    })
                   } else if (r.dismiss) {
-                    this.loseCard()
+                    this.props.pubnub.publish({
+                      message: {
+                        type: 'challengedPlayerLost',
+                        challengedPlayerId: msg.message.challengedPlayerId,
+                        challengedPlayerUn: msg.message.challengedPlayerUn,
+                        challengingPlayerId: msg.message.challengingPlayerId,
+                        challengingPlayerUn: msg.message.challengingPlayerUn,
+                        challengedCard: msg.message.challengedCard,
+                        action: msg.message.action,
+                      },
+                      channel: this.props.gameChannel
+                    })
                   }
                 })
               } else {
                 Swal.fire({
                   title: 'You were called out!',
-                  timer: 1500,
-                  showConfirmButton: false,
+                  timer: globalSwalTimer,
+                  // showConfirmButton: false,
                   allowOutsideClick: false,
                   allowEscapeKey: false,
                 })
-                .then(r => this.loseCard())
+                .then(r => {
+                  this.props.pubnub.publish({
+                    message: {
+                      type: 'challengedPlayerLost',
+                      challengedPlayerId: msg.message.challengedPlayerId,
+                      challengedPlayerUn: msg.message.challengedPlayerUn,
+                      challengingPlayerId: msg.message.challengingPlayerId,
+                      challengingPlayerUn: msg.message.challengingPlayerUn,
+                      challengedCard: msg.message.challengedCard,
+                      action: msg.message.action,
+                    },
+                    channel: this.props.gameChannel
+                  })
+                })
               }
             } else if (this.props.player.id === msg.message.challengingPlayerId) {
               console.log(`You challenged ${msg.message.challengedPlayerUn}'s ${msg.message.challengedCard}!`)
@@ -225,12 +262,64 @@ class Game extends React.Component {
                 allowOutsideClick: false,
                 allowEscapeKey: false,
                 // need to have no timer, wait on challenged player's response
-                timer: globalSwalTimer,
-                timerProgressBar: true,
+                // timer: globalSwalTimer,
+                // timerProgressBar: true,
               })
             } else {
               console.log(`${msg.message.challengedPlayerUn} has been challenged by ${msg.message.challengingPlayerUn}.`)
               Swal.close()
+            }
+            break
+          case 'challengedPlayerWon':
+            if (this.props.player.id === msg.message.challengedPlayerId) {
+              Swal.fire({
+                title: `You show your ${msg.message.challengedCard}, winning the challenge!`,
+                text: `${msg.message.challengingPlayerUn} loses a card and doesn't get to ${msg.message.action}.`,
+                timer: globalSwalTimer,
+                timerProgressBar: true,
+              })
+              .then(r => this.showCard(msg.message.challengedCard))
+            } else if (this.props.player.id === msg.message.challengingPlayerId) {
+              Swal.close()
+              Swal.fire({
+                title: `${msg.message.challengedPlayerUn} had a ${msg.message.challengedCard}! You lost the challenge!`,
+                text: 'You lose a card.',
+                icon: 'error',
+                allowEscapeKey: false,
+                allowOutsideClick: false,
+                timer: globalSwalTimer,
+                timerProgressBar: true,
+              })
+              .then(r => this.loseCard())
+            }
+            break
+          case 'challengedPlayerLost':
+            if (this.props.player.id === msg.message.challengedPlayerId) {
+              Swal.fire({
+                title: 'You lost the challenge!',
+                text: 'You lose a card.',
+                icon: 'error',
+                allowEscapeKey: false,
+                allowOutsideClick: false,
+                timer: globalSwalTimer,
+                timerProgressBar: true,
+              })
+              .then(r => this.loseCard())
+            } else if (this.props.player.id === msg.message.challengingPlayerId) {
+              // Swal.close()
+
+              // switch case rewards per action type
+              this.updateCoins(2)
+              this.updateTreasury(-2)
+
+              Swal.fire({
+                title: `You won the challenge! You use ${msg.message.action}.`,
+                text: `${msg.message.challengedPlayerUn} loses a card.`,
+                icon: 'success',
+                timer: globalSwalTimer,
+                timerProgressBar: true,
+              })
+              .then(r => this.showCard(msg.message.challengedCard))
             }
             break
           case 'log':
@@ -381,15 +470,14 @@ class Game extends React.Component {
       .then(r => {
         this.props.revealCard(i)
         this.updatePlayer()
+        this.endTurn()
       })
     })
   }
 
   // choose card to show when challenged, show on timer(?), shuffle into deck and draw a new card
   showCard = (card) => {
-    Swal.fire({
-      title: `Showing ${card}!`
-    })
+    
   }
 
 

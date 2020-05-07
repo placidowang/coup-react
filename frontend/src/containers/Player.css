@@ -68,6 +68,12 @@ p.player-name {
   width: 216px;
 }
 
+.player-hand div.card.revealed {
+  background: rgba(0,0,0, 0.65);
+  z-index: 300000;
+  /* overflow: visible; */
+}
+
 .actions {
   display: inline-grid;
 }

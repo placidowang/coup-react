@@ -11,7 +11,12 @@
   font-family: 'muli';
 }
 
+/* not sure if this does anything */
 .swal2-text {
+  font-family: 'muli';
+}
+
+.swal2-content {
   font-family: 'muli';
 }
 
