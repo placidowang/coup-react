@@ -1,11 +1,12 @@
 .player-container {
   /* height: 35vh; */
-  height: 400px;
+  height: 380px;
   margin: 5px;
   border-color: black;
   border-style: solid;
+  border-width: 4px;
   position: absolute;
-  top: 420px;
+  top: 426px;
   left: 50vw;
   transform: translateX(-50%);
   display: inline-flex;
@@ -18,7 +19,7 @@
 
 .player-name-hand-coin-container {
   border-color: black;
-  border-style: solid;
+  border-right: solid;
   border-width: 2px;
 }
 
@@ -27,8 +28,8 @@
   display: inline-flex;
   align-items: center;
   border-color: black;
-  border-style: solid;
-  border-width: 1px;
+  border-bottom: solid;
+  border-width: 2px;
 }
 
 p.player-name {
@@ -36,9 +37,9 @@ p.player-name {
   font-weight: bold;
   font-size: 26px;
   width: 50%;
-  border-color: black;
-  border-style: solid;
-  border-width: 4px;
+  border-right: solid;
+  border-right-color: black;
+  border-width: 2px;
   margin: 0px;
 }
 
