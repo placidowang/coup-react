@@ -1,14 +1,20 @@
 .card {
   border-style: solid;
   border-color: black;
-  border-width: 5px;
+  border-width: 2px;
   border-radius: 15px;
-  height: 300px;
-  /* height: 90%; */
-  width: 216px;
+  /* height: 300px; */
+  /* height: 100%; */
+  /* width: 216px; */
   /* width: 100%; */
   /* width: auto; */
   margin: 5px;
+  box-shadow: 2px 2px 1px grey;
+  /* padding-top: 75%; */
+}
+
+.revealed {
+  box-shadow: 3px 3px 1px greenyellow;
 }
 
 .duke {

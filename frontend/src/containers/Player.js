@@ -127,9 +127,9 @@ class Player extends React.Component {
             <p className='player-name'>{player.username}</p>
             <p className='coins'>Coins: {player.coins}</p>
           </div>
-          <div className='hand-container'>
+          <div className='player-hand-container'>
             <p>Hand</p>
-            <div className='hand'>
+            <div className='player-hand'>
               {player.hand.map(card => <Card key={card.id} card={card} />)}
             </div>
           </div>

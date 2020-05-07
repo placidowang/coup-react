@@ -3,6 +3,7 @@ import Swal from 'sweetalert2'
 import { connect } from 'react-redux'
 import Player from '../containers/Player.js'
 import OpponentsContainer from '../containers/OpponentsContainer.js'
+import Card from './Card.js'
 import './Game.css'
 
 const globalSwalTimer = 10000
@@ -36,6 +37,7 @@ class Game extends React.Component {
             this.props.setActivePlayer()
             if (msg.message.playerId === this.props.player.id) {
               this.props.addCardsToHand(msg.message.cards)
+              this.updatePlayer(this.props.player)
             }
             break
           case 'endTurn':
@@ -88,49 +90,13 @@ class Game extends React.Component {
               }
               // include buttons to counter OR challenge
               else if (msg.message.associatedCard && msg.message.counterCard) {
-                Swal.fire({
-                  title: `Oh SHIT, ${this.props.activePlayer.username} is trying to use ${msg.message.action}!!!`,
-                  showCancelButton: true,
-                  timer: globalSwalTimer,
-                  timerProgressBar: true,
-                  // cancelButtonColor: '#B0B0B0',
-                  cancelButtonText: 'Let him get away with it... this time',
-                  confirmButtonText: `COUNTER the bastard with my ${msg.message.counterCard}.`,
-                  allowOutsideClick: false,
-                  html: "<span class='swal2-text'><b></b></span>",
-                  onBeforeOpen: () => {
-                    setInterval(() => {
-                      const content = Swal.getContent()
-                      if (content) {
-                        const b = content.querySelector('b')
-                        if (b && Swal.getTimerLeft()) {
-                          b.textContent = Math.ceil(Swal.getTimerLeft() / 1000)
-                        }
-                      }
-                    }, 100)
-                  }
-                })
-                .then(r => {
-                  // console.log(msg.message.counterCard)
-                  if (r.value) {
-                    this.props.pubnub.publish({
-                      message: {
-                        type: 'counter',
-                        counteredPlayerId: this.props.activePlayer.id,
-                        counteringPlayerId: this.props.player.id,
-                        counterCard: msg.message.counterCard
-                      },
-                      channel: this.props.gameChannel
-                    })
-                  } else {
-                    console.log("Letting it slide")
-                  }
-                })
+                
               }
             } else {
               Swal.fire({
                 title: 'Waiting for other players.',
                 allowOutsideClick: false,
+                allowEscapeKey: false,
                 showConfirmButton: false,
                 timer: globalSwalTimer,
                 timerProgressBar: true,
@@ -149,7 +115,6 @@ class Game extends React.Component {
                   this.endTurn()
                 }
               })
-              
             }
             break
           case 'counter':
@@ -161,6 +126,7 @@ class Game extends React.Component {
                 cancelButtonText: 'Back down',
                 confirmButtonText: 'CHALLENGE',
                 allowOutsideClick: false,
+                allowEscapeKey: false,
                 timer: globalSwalTimer,
                 timerProgressBar: true,
                 html: "<span class='swal2-text'>Backing down in <b></b></span>",
@@ -202,6 +168,7 @@ class Game extends React.Component {
                 timer: globalSwalTimer,
                 timerProgressBar: true,
                 allowOutsideClick: false,
+                allowEscapeKey: false,
                 showConfirmButton: false,
               })
               .then(r => {
@@ -212,6 +179,7 @@ class Game extends React.Component {
                     timer: 1500,
                     timerProgressBar: true,
                     allowOutsideClick: false,
+                    allowEscapeKey: false,
                     showConfirmButton: false,
                   })
                 }
@@ -222,44 +190,43 @@ class Game extends React.Component {
             }
             break
           case 'challenge':
-            // console.log(this.props.player.id)
-            // console.log(msg)
-            // console.log(msg.message.challengedPlayerId + ' has been challenged!')
             if (this.props.player.id === msg.message.challengedPlayerId) {
               Swal.close()
               const challengedCard = this.props.player.hand.find(card => card.name === msg.message.challengedCard)
-              if (challengedCard && !challengedCard.revealed) {
+              if (challengedCard && !challengedCard.isRevealed) {
                 Swal.fire({
                   title: `${msg.message.challengingPlayerUn} challenged you!`,
                   showCancelButton: true,
                   cancelButtonText: "Lose a card (Hint: don't do this)",
                   confirmButtonText: `Show my ${msg.message.challengedCard}.`
                 })
-                .then(r => console.log(r))
+                .then(r => {
+                  if (r.value) {
+                    this.showCard(msg.message.challengedCard)
+                  } else if (r.dismiss) {
+                    this.loseCard()
+                  }
+                })
               } else {
                 Swal.fire({
-                  title: `You were called out! :(`,
-                  // footer: 'fuck',
+                  title: 'You were called out!',
+                  timer: 1500,
+                  showConfirmButton: false,
+                  allowOutsideClick: false,
+                  allowEscapeKey: false,
                 })
+                .then(r => this.loseCard())
               }
             } else if (this.props.player.id === msg.message.challengingPlayerId) {
               console.log(`You challenged ${msg.message.challengedPlayerUn}'s ${msg.message.challengedCard}!`)
               Swal.fire({
                 title: `You challenged ${msg.message.challengedPlayerUn}'s ${msg.message.challengedCard}!`,
                 showConfirmButton: false,
-                // timer: globalSwalTimer,
-                // timerProgressBar: true,
-              })
-              .then(r => {
-                console.log(r)
-                if (r.dismiss === 'timer') {
-                  Swal.fire({
-                    title: `${msg.message.challengedPlayerUn} lost a card!`,
-                    showConfirmButton: false,
-                    timer: 1500,
-                    icon: 'success'
-                  })
-                }
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                // need to have no timer, wait on challenged player's response
+                timer: globalSwalTimer,
+                timerProgressBar: true,
               })
             } else {
               console.log(`${msg.message.challengedPlayerUn} has been challenged by ${msg.message.challengingPlayerUn}.`)
@@ -367,6 +334,65 @@ class Game extends React.Component {
     this.updatePlayer()
   }
 
+  // pick card to reveal, or lose one randomly based on timer
+  loseCard = () => {
+    /* if player only has one unrevealed card, player loses the game */
+    Swal.fire({
+      title: `Pick a card to lose.`,
+      focusConfirm: false,
+      showCancelButton: true,
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: `Lose ${this.props.player.hand[0].name}`,
+      cancelButtonText: `Lose ${this.props.player.hand[1].name}`,
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      timer: globalSwalTimer,
+      timerProgressBar: true,
+      html: "<span class='swal2-text'>Losing a random card in <b></b></span>",
+      onBeforeOpen: () => {
+        setInterval(() => {
+          const content = Swal.getContent()
+          if (content) {
+            const b = content.querySelector('b')
+            if (b && Swal.getTimerLeft()) {
+              b.textContent = Math.ceil(Swal.getTimerLeft() / 1000)
+            }
+          }
+        }, 100)
+      }
+      // footer: 'fuck',
+    })
+    .then(r => {
+      console.log(r)
+      let i
+      if (r.value) {
+        i = 0
+      } else if (r.dismiss === 'cancel') {
+        i = 1
+      } else {
+        i = Math.round(Math.random())
+      }
+      
+      Swal.fire({
+        title: `Lost ${this.props.player.hand[i].name}!`,
+        timer: 1500,
+        showConfirmButton: false,
+      })
+      .then(r => {
+        this.props.revealCard(i)
+        this.updatePlayer()
+      })
+    })
+  }
+
+  // choose card to show when challenged, show on timer(?), shuffle into deck and draw a new card
+  showCard = (card) => {
+    Swal.fire({
+      title: `Showing ${card}!`
+    })
+  }
+
+
   endTurn = () => {
     this.props.pubnub.publish({
       message: { type: 'endTurn' },
@@ -374,13 +400,7 @@ class Game extends React.Component {
     })
   }
 
-  // pick card to reveal
-  loseCard = () => {
-
-  }
-
-  // choose card to reveal, reveal on timer(?), shuffle into deck and draw a new card
-  revealCard = () => {
+  gameOver = () => {
 
   }
 
@@ -407,15 +427,22 @@ class Game extends React.Component {
       <div className='game'>
         <OpponentsContainer />
         <p className='whose-turn'>Whose turn: {this.props.activePlayer.username ? this.props.activePlayer.username : null}</p>
-        <p>Treasury: {this.props.treasury} coins</p>
 
-        <p>Court Deck: {this.props.deck.length} cards</p>
+        <div className='treasury'>
+          <p>Treasury: {this.props.treasury} coins</p>
+        </div>
+
+        <div className='court-deck'>
+          <Card />
+          <p>Court Deck: {this.props.deck.length} cards</p>
+        </div>
         {/* <p>Deck: {this.props.deck.map(card => card.name).join(', ')}</p> */}
         {/* <button onClick={()=>this.shuffleDeck()}>Shuffle Deck</button> */}
         {/* <button onClick={() => this.testMsg('GAME YO')}>message</button> */}
         {/* <button onClick={this.hereNow}>log who's here</button> */}
         {/* <button onClick={this.logPlayers}>log players</button> */}
-        <br/><button onClick={this.endTurn}>End Turn</button>
+
+        {/* <br/><button onClick={this.endTurn}>End Turn</button> */}
 
         {/* <p style={{fontSize: '20px'}}>Players: {this.props.players.map(player => player.username).join(', ')}</p> */}
         <Player />
@@ -449,6 +476,7 @@ const mapDispatchToProps = (dispatch) => {
     updateCoins: ((amt) => dispatch({type: 'updateCoins', amt: amt})),
     updateTreasury: ((treasury) => dispatch({type: 'updateTreasury', treasury: treasury})),
     setActivePlayer: (() => dispatch({type: 'setActivePlayer'})),
+    revealCard: ((i) => dispatch({type: 'revealCard', i: i})),
     endTurn: (() => dispatch({type: 'endTurn'})),
   }
 }

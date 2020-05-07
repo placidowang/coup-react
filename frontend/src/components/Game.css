@@ -5,4 +5,28 @@
 
 .whose-turn {
   font-size: 30px;
+  margin: 10px;
+}
+
+.treasury {
+  margin: -10px;
+}
+
+.court-deck {
+  display: inline-flex;
+  align-items: center;
+}
+
+.court-deck div.card {
+  height: 90px;
+  width: 66px;
+  margin: 5px;
+  padding: 2px;
+  border-width: 1px;
+  border-radius: 7px;
+  box-shadow: 5px 2px 3px grey;
+}
+
+.court-deck .card img {
+  height: 100%;
 }

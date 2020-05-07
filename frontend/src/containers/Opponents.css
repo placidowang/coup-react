@@ -2,7 +2,7 @@
   justify-content: center;
   border-style: solid;
   border-color: black;
-  /* height: 140px; */
+  height: 234px;
   width: 100vw;
   margin: -11px;
   top: 0px;
@@ -24,13 +24,61 @@
   border-style: solid;
   border-color: black;
   margin: 10px;
+  height: 177px;
 }
 
 .opponent p {
-  font-size: 20px;
+  font-size: 18px;
   margin: 0px;
 }
 
 .opponent p.opponent-name {
   color: red;
+  font-weight: bold;
+  border-bottom: solid;
+  border-color: black;
+  border-width: 1px;
+}
+
+.opponent-hand-container {
+  /* height: 60px; */
+  align-items: center;
+  position: relative;
+  /* top: 20px; */
+  border-top: solid;
+  border-width: 1px;
+}
+
+.opponent-hand {
+  display: inline-flex;
+  height: 60px;
+}
+
+.opponent-hand div.card {
+  height: 90px;
+  width: 68px;
+  
+  /* margin: 0px; */
+  padding: 2px;
+  border-width: 1px;
+  border-radius: 7px;
+  box-shadow: 1px 1px grey;
+}
+
+.opponent-hand div.card p {
+  font-size: 10px;
+}
+
+.opponent-hand div.card img.portrait {
+  height: 72px;
+  margin: 0px -3px;
+  border-width: 1px;
+}
+
+.opponent-hand div.card img.cardback {
+  height: 100%;
+}
+
+.opponent-hand div.card div.card-info {
+  display: none;
 }

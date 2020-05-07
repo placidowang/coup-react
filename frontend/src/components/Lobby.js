@@ -115,19 +115,26 @@ class Lobby extends React.Component {
   }
 
   startGame = () => {
-    if (!this.props.isHost) {
-      console.log('You are NOT the host!!')
-      Swal.fire('Please wait for the host to start the game.')
-      // return
-    } else {
-      console.log('Starting game')
+    // this.props.pubnub.hereNow({channels: [this.props.lobbyChannel]})
+    // .then(channel => {
+      // console.log(channel)
+      if (!this.props.isHost) {
+        console.log('You are NOT the host!!')
+        Swal.fire('Please wait for the host to start the game.')
+      // } else if (channel.totalOccupancy > 1) {
+      } else if (this.props.players.length > 1) {
+        console.log('Starting game')
 
-      // publish message for everyone to start game
-      this.props.pubnub.publish({
-        message: { type: 'startGame' },
-        channel: this.props.lobbyChannel
-      })
-    }
+        // publish message for everyone to start game
+        this.props.pubnub.publish({
+          message: { type: 'startGame' },
+          channel: this.props.lobbyChannel
+        })
+      } else {
+        console.log('Please wait for at least one opponent.')
+        Swal.fire('Please wait for at least one opponent.')
+      }
+    // })
   }
 
   playGame = () => {

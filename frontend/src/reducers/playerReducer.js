@@ -63,6 +63,14 @@ export default function playerReducer(state = initialState, action) {
       return {...state,
         coins: state.coins + action.amt
       }
+    case 'revealCard':
+      const revealedCard = state.hand[action.i]
+      revealedCard.isRevealed = true
+      const newHand = [...state.hand]
+      newHand[action.i] = revealedCard
+      return {...state,
+        hand: newHand
+      }
     default:
       return state
   }
