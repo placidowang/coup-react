@@ -31,7 +31,6 @@ d1 = Deck.create
     effect: 'Exchange cards with Court Deck',
     counteraction: 'Blocks stealing',
     description: 'Exchange cards with Court Deck. Blocks stealing.',
-
     deck_id: d1.id
   )
 
