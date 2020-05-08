@@ -61,7 +61,17 @@ button.start:active {
   background-color: rgb(138, 250, 116)
 }
 
-.player-list {
+.lobby-player-list-container {
   font-size: 22px;
+  border-style: solid;
+  display: inline-flex;
 }
 
+.lobby-player-list {
+  width: 400px;
+}
+
+.lobby-player-list-title {
+  margin: 0px;
+  border-bottom: solid;
+}

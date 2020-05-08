@@ -234,7 +234,8 @@ class Game extends React.Component {
               } else {
                 Swal.fire({
                   title: 'You were called out!',
-                  timer: globalSwalTimer,
+                  timer: 1500,
+                  timerProgressBar: true,
                   // showConfirmButton: false,
                   allowOutsideClick: false,
                   allowEscapeKey: false,
@@ -275,6 +276,7 @@ class Game extends React.Component {
               Swal.fire({
                 title: `You show your ${msg.message.challengedCard}, winning the challenge!`,
                 text: `${msg.message.challengingPlayerUn} loses a card and doesn't get to ${msg.message.action}.`,
+                icon: 'success',
                 timer: globalSwalTimer,
                 timerProgressBar: true,
               })
