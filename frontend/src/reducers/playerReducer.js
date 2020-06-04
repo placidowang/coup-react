@@ -64,7 +64,8 @@ export default function playerReducer(state = initialState, action) {
         coins: state.coins + action.amt
       }
     case 'revealCard':
-      const revealedCard = state.hand[action.i]
+      // need to create deep clone a la JSON.parse/stringify
+      const revealedCard = JSON.parse(JSON.stringify(state.hand[action.i]))
       revealedCard.isRevealed = true
       const newHand = [...state.hand]
       newHand[action.i] = revealedCard

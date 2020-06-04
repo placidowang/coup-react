@@ -69,9 +69,25 @@ p.player-name {
 }
 
 .player-hand div.card.revealed {
-  background: rgba(0,0,0, 0.65);
-  z-index: 300000;
-  /* overflow: visible; */
+  opacity: .4;
+  /* position: relative; */
+  /* z-index: -2; */
+}
+
+.player-hand div.overlay {
+  /* width: 100%; */
+  /* text-align: center; */
+}
+
+.player-hand p.x {
+  color: red;
+  font-weight: bold;
+  font-size: 254px;
+  position: absolute;
+  z-index: 1;
+  width: 227px;
+  bottom: 20px;
+  text-shadow: 6px 2px rgba(0,0,0,0.8);
 }
 
 .actions {

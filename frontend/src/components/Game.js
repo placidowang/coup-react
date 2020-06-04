@@ -43,7 +43,7 @@ class Game extends React.Component {
           case 'endTurn':
             // Swal.close()
             this.props.endTurn()
-            console.log(this.props.whosTurnIsIt)
+            console.log(`${this.props.players[this.props.whosTurnIsIt].username}'s turn.`)
             this.props.setActivePlayer()
             break
           case 'alert':
@@ -144,7 +144,7 @@ class Game extends React.Component {
               })
               .then(r => {
                 if (r.value) {
-                  console.log('send challenge to: ' + this.props.activePlayer)
+                  console.log('send challenge to: ' + msg.message.counteringPlayerUn)
                   this.props.pubnub.publish({
                     message: {
                       type: 'challenge',
@@ -454,7 +454,7 @@ class Game extends React.Component {
       // footer: 'fuck',
     })
     .then(r => {
-      console.log(r)
+      // console.log(r)
       let i
       if (r.value) {
         i = 0

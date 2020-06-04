@@ -54,6 +54,10 @@
   height: 60px;
 }
 
+.opponent-hand p.x {
+  display: none;
+}
+
 .opponent-hand div.card {
   height: 90px;
   width: 68px;
