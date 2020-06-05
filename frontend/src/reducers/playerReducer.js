@@ -52,12 +52,13 @@ export default function playerReducer(state = initialState, action) {
       return {...state,
         username: action.username
       }
-    // case 'drawCard':
-    //   state.hand.push(action.card)
-    //   return state
-    case 'addCardsToHand':
+    case 'getNewCard':
+      state.hand.push(action.card)
+      return state
+    case 'updateHand':
       return {...state,
-        hand: [...state.hand, ...action.cards]
+        // hand: [...state.hand, ...action.cards]
+        hand: action.cards
       }
     case 'updateCoins':
       return {...state,

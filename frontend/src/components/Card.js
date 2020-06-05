@@ -4,7 +4,7 @@ import './Card.css'
 
 class Card extends React.Component {
   render() {
-    console.log(this.props.card)
+    // console.log(this.props.card)
     if (this.props.card) {
       if (this.props.card.isRevealed) {
         return(

@@ -33,11 +33,12 @@ class Game extends React.Component {
           case 'updateTreasury':
             this.props.updateTreasury(msg.message.treasury)
             break
-          case 'addCardsToHand':
+          case 'updateHand':
             this.props.setActivePlayer()
             if (msg.message.playerId === this.props.player.id) {
-              this.props.addCardsToHand(msg.message.cards)
-              this.updatePlayer(this.props.player)
+              this.props.updateHand(msg.message.cards)
+              // this.updatePlayer(this.props.player)
+              this.updatePlayer()
             }
             break
           case 'endTurn':
@@ -144,7 +145,7 @@ class Game extends React.Component {
               })
               .then(r => {
                 if (r.value) {
-                  console.log('send challenge to: ' + msg.message.counteringPlayerUn)
+                  console.log('Sending challenge to ' + msg.message.counteringPlayerUn)
                   this.props.pubnub.publish({
                     message: {
                       type: 'challenge',
@@ -280,7 +281,7 @@ class Game extends React.Component {
                 timer: globalSwalTimer,
                 timerProgressBar: true,
               })
-              .then(r => this.showCard(msg.message.challengedCard))
+              .then(r => this.getNewCard(msg.message.challengedCard))
             } else if (this.props.player.id === msg.message.challengingPlayerId) {
               Swal.close()
               Swal.fire({
@@ -321,7 +322,8 @@ class Game extends React.Component {
                 timer: globalSwalTimer,
                 timerProgressBar: true,
               })
-              .then(r => this.showCard(msg.message.challengedCard))
+              // don't show card
+              // .then(r => this.getNewCard(msg.message.challengedCard))
             }
             break
           case 'log':
@@ -344,19 +346,26 @@ class Game extends React.Component {
   }
   
   initializeGame = (deckData) => {
-    const deck = deckData.cards.map(card => ({...card, isRevealed: false}))
+    let deck = deckData.cards.map(card => ({...card, isRevealed: false}))
+    // deck = deck.filter(card => card.name === "Duke" || card.name === "Assassin")
     const shuffledDeck = this.shuffleDeck(deck)
     this.distributeCards(shuffledDeck)
   }
 
-  shuffleDeck = (deck = [...this.props.deck]) => {
+  shuffleDeck = (deck = [...this.props.deck], getNewCard = false) => {
     for (let i = deck.length - 1; i > 0; i--) {
       let j = Math.floor(Math.random() * (i + 1));
       [deck[i], deck[j]] = [deck[j], deck[i]]
     }
 
-    this.updateDeck(deck)
-    return deck
+    if (getNewCard) {
+      const newCard = deck.shift()
+      this.updateDeck(deck)
+      return newCard
+    } else {
+      this.updateDeck(deck)
+      return deck
+    }
   }
 
   updateDeck = (deck) => {
@@ -374,7 +383,7 @@ class Game extends React.Component {
 
       this.props.pubnub.publish({
         message: {
-          type: 'addCardsToHand',
+          type: 'updateHand',
           playerId: player.id,
           cards: [card1, card2]
         },
@@ -478,10 +487,22 @@ class Game extends React.Component {
   }
 
   // choose card to show when challenged, show on timer(?), shuffle into deck and draw a new card
-  showCard = (card) => {
-    
-  }
+  getNewCard = (challengedCard) => {
+    const oldCard = this.props.player.hand.find(card => card.name === challengedCard)
+    this.props.deck.push(oldCard)
+    const newCard = this.shuffleDeck(this.props.deck, true)
+    const aOrAn = /[AEIOU]/.test(newCard.name.charAt(0)) ? "an" : "a"
+    Swal.fire({
+      title: `You shuffled in your ${oldCard.name} and got ${aOrAn} ${newCard.name}!`,
+      timer: 1500,
+      showConfirmButton: false,
+    })
 
+    const newHand = [...this.props.player.hand]
+    newHand[newHand.findIndex(card => card.id === oldCard.id)] = newCard
+    this.props.updateHand(newHand)
+    this.updatePlayer()
+  }
 
   endTurn = () => {
     this.props.pubnub.publish({
@@ -491,7 +512,11 @@ class Game extends React.Component {
   }
 
   gameOver = () => {
-
+    Swal.close()
+    Swal.fire({
+      title: 'Game over, man!'
+    })
+    // remove player from players
   }
 
   testMsg = (msg) => {
@@ -560,8 +585,8 @@ const mapDispatchToProps = (dispatch) => {
     initDeck: ((cards) => dispatch({type: 'initializeDeck', cards: cards})),
     updateDeck: ((deck) => dispatch({type: 'updateDeck', updatedDeck: deck})),
     updatePlayer: ((player) => dispatch({type: 'updatePlayer', player: player})),
-    // drawCard: ((card) => dispatch({type: 'drawCard', card: card})),
-    addCardsToHand: ((cards) => dispatch({type: 'addCardsToHand', cards: cards})),
+    getNewCard: ((card) => dispatch({type: 'getNewCard', card: card})),
+    updateHand: ((cards) => dispatch({type: 'updateHand', cards: cards})),
     changeTreasury: ((amt) => dispatch({type: 'changeTreasury', amt: amt})),
     updateCoins: ((amt) => dispatch({type: 'updateCoins', amt: amt})),
     updateTreasury: ((treasury) => dispatch({type: 'updateTreasury', treasury: treasury})),
