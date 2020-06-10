@@ -1,7 +1,8 @@
 const initialState = {
   id: NaN,
-  // username: Math.random().toString(36).slice(2,5),
-  username: '',
+  gameOver: false,
+  username: Math.random().toString(36).slice(2,5),
+  // username: '',
   hand: [],
   coins: 2,
   // actions: ['Income', 'Foreign Aid', 'Coup', 'Tax', 'Assassinate', 'Exchange', 'Steal'],
@@ -63,6 +64,10 @@ export default function playerReducer(state = initialState, action) {
     case 'updateCoins':
       return {...state,
         coins: state.coins + action.amt
+      }
+    case 'gameOver':
+      return {...state,
+        gameOver: true
       }
     case 'revealCard':
       // need to create deep clone a la JSON.parse/stringify

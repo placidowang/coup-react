@@ -283,31 +283,45 @@ class Game extends React.Component {
               })
               .then(r => this.getNewCard(msg.message.challengedCard))
             } else if (this.props.player.id === msg.message.challengingPlayerId) {
-              Swal.close()
-              Swal.fire({
-                title: `${msg.message.challengedPlayerUn} had a ${msg.message.challengedCard}! You lost the challenge!`,
-                text: 'You lose a card.',
-                icon: 'error',
-                allowEscapeKey: false,
-                allowOutsideClick: false,
-                timer: globalSwalTimer,
-                timerProgressBar: true,
-              })
-              .then(r => this.loseCard())
+              if (this.props.player.hand.filter(card => card.isRevealed === true).length === 1) {
+                Swal.fire({
+                  title: `${msg.message.challengedPlayerUn} had a ${msg.message.challengedCard}!`,
+                  timer: 2000,
+                  showConfirmButton: false,
+                  allowOutsideClick: false,
+                })
+                .then(r => this.gameOver())
+              } else {
+                Swal.close()
+                Swal.fire({
+                  title: `${msg.message.challengedPlayerUn} had a ${msg.message.challengedCard}! You lost the challenge!`,
+                  text: 'You lose a card.',
+                  icon: 'error',
+                  allowEscapeKey: false,
+                  allowOutsideClick: false,
+                  timer: globalSwalTimer,
+                  timerProgressBar: true,
+                })
+                .then(r => this.loseCard())
+              }
             }
             break
           case 'challengedPlayerLost':
             if (this.props.player.id === msg.message.challengedPlayerId) {
-              Swal.fire({
-                title: 'You lost the challenge!',
-                text: 'You lose a card.',
-                icon: 'error',
-                allowEscapeKey: false,
-                allowOutsideClick: false,
-                timer: globalSwalTimer,
-                timerProgressBar: true,
-              })
-              .then(r => this.loseCard())
+              if (this.props.player.hand.filter(card => card.isRevealed === true).length === 1) {
+                this.gameOver()
+              } else {
+                Swal.fire({
+                  title: 'You lost the challenge!',
+                  text: 'You lose a card.',
+                  icon: 'error',
+                  allowEscapeKey: false,
+                  allowOutsideClick: false,
+                  timer: globalSwalTimer,
+                  timerProgressBar: true,
+                })
+                .then(r => this.loseCard())  
+              }
             } else if (this.props.player.id === msg.message.challengingPlayerId) {
               // Swal.close()
 
@@ -486,7 +500,7 @@ class Game extends React.Component {
     })
   }
 
-  // choose card to show when challenged, show on timer(?), shuffle into deck and draw a new card
+  // after showing winning a card, shuffle it into deck and draw a new card
   getNewCard = (challengedCard) => {
     const oldCard = this.props.player.hand.find(card => card.name === challengedCard)
     this.props.deck.push(oldCard)
@@ -494,7 +508,7 @@ class Game extends React.Component {
     const aOrAn = /[AEIOU]/.test(newCard.name.charAt(0)) ? "an" : "a"
     Swal.fire({
       title: `You shuffled in your ${oldCard.name} and got ${aOrAn} ${newCard.name}!`,
-      timer: 1500,
+      timer: 2000,
       showConfirmButton: false,
     })
 
@@ -514,9 +528,19 @@ class Game extends React.Component {
   gameOver = () => {
     Swal.close()
     Swal.fire({
-      title: 'Game over, man!'
+      title: 'Game over, man!',
+      showConfirmButton: false,
+      allowOutsideClick: false
     })
-    // remove player from players
+    // reveal remaining card
+    const newHand = [...this.props.player.hand]
+    const i = (this.props.player.hand[0].isRevealed) ? 1 : 0
+    newHand[i] = {...newHand[i], isRevealed: true}
+    this.props.updateHand(newHand)
+    // skip player in turn order; cannot just remove player from players list or their cards will also be removed
+    this.props.gameOver()
+    this.updatePlayer()
+    this.endTurn()
   }
 
   testMsg = (msg) => {
@@ -593,6 +617,7 @@ const mapDispatchToProps = (dispatch) => {
     setActivePlayer: (() => dispatch({type: 'setActivePlayer'})),
     revealCard: ((i) => dispatch({type: 'revealCard', i: i})),
     endTurn: (() => dispatch({type: 'endTurn'})),
+    gameOver: (() => dispatch({type: 'gameOver'})),
   }
 }
 

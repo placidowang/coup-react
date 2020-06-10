@@ -4,7 +4,6 @@ const initialState = {
   treasury: 50,
   activePlayer: {},
   whosTurnIsIt: 0,
-  gameOver: false,
 }
 
 export default function gameReducer(state = initialState, action) {
@@ -48,9 +47,11 @@ export default function gameReducer(state = initialState, action) {
         activePlayer: state.players[state.whosTurnIsIt]
       }
     case 'endTurn':
-      return {...state,
-        whosTurnIsIt: (state.whosTurnIsIt + 1) % state.players.length
+      do {
+        state.whosTurnIsIt = (state.whosTurnIsIt + 1) % state.players.length
       }
+      while (state.players[state.whosTurnIsIt].gameOver === true)
+      return state
     default:
       return state
   }
