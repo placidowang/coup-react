@@ -130,17 +130,23 @@ class Game extends React.Component {
                 allowEscapeKey: false,
                 timer: globalSwalTimer,
                 timerProgressBar: true,
-                html: "<span class='swal2-text'>Backing down in <b></b></span>",
+                html: "<span class='swal2-text'>Backing down in <b></b></span><button id='testBtn'>sup</button>",
                 onBeforeOpen: () => {
+                  const content = Swal.getContent()
                   setInterval(() => {
-                    const content = Swal.getContent()
                     if (content) {
                       const b = content.querySelector('b')
                       if (b && Swal.getTimerLeft()) {
                         b.textContent = Math.ceil(Swal.getTimerLeft() / 1000)
                       }
+                      
                     }
                   }, 100)
+                  
+                  const testBtn = content.querySelector('#testBtn')
+                  testBtn.addEventListener('click', () => {
+                    console.log('clicked test button')
+                  })
                 }
               })
               .then(r => {
