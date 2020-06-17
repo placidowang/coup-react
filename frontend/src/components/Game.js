@@ -128,7 +128,7 @@ class Game extends React.Component {
                 confirmButtonText: 'CHALLENGE',
                 allowOutsideClick: false,
                 allowEscapeKey: false,
-                timer: globalSwalTimer,
+                timer: 9999999,
                 timerProgressBar: true,
                 html: "<span class='swal2-text'>Backing down in <b></b></span><button id='testBtn'>sup</button>",
                 onBeforeOpen: () => {
@@ -147,6 +147,15 @@ class Game extends React.Component {
                   testBtn.addEventListener('click', () => {
                     console.log('clicked test button')
                   })
+
+                  const actions = document.querySelector('.swal2-actions')
+                  const testBtn2 = document.createElement('button')
+                  testBtn2.innerHTML = 'Test2'
+                  testBtn2.addEventListener('click', () => {
+                    console.log('test2')
+                  })
+                  testBtn2.className = "swal2-confirm swal2-styled"
+                  actions.append(testBtn2)
                 }
               })
               .then(r => {
