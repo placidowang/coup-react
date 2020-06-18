@@ -88,6 +88,46 @@ class Game extends React.Component {
                     console.log("Letting it slide")
                   }
                 })
+              } else if (msg.message.associatedCard && !msg.message.counterCard) {
+                Swal.fire({
+                  title: `${this.props.activePlayer.username} is trying to use ${msg.message.action} with a ${msg.message.associatedCard}!`,
+                  timer: globalSwalTimer,
+                  timerProgressBar: true,
+                  showCancelButton: true,
+                  cancelButtonText: `Let ${this.props.activePlayer.username} use ${msg.message.action}... this time.`,
+                  confirmButtonText: `CHALLENGE`,
+                  html: `<span class='swal2-text'>Letting ${this.props.activePlayer.username} use ${msg.message.action} in <b></b></span>`,
+                  onBeforeOpen: () => {
+                    setInterval(() => {
+                      const content = Swal.getContent()
+                      if (content) {
+                        const b = content.querySelector('b')
+                        if (b && Swal.getTimerLeft()) {
+                          b.textContent = Math.ceil(Swal.getTimerLeft() / 1000)
+                        }
+                      }
+                    }, 100)
+                  }
+                })
+                .then(r => {
+                  if (r.value) {
+                    console.log('Sending challenge to ' + msg.message.counteringPlayerUn)
+                    this.props.pubnub.publish({
+                      message: {
+                        type: 'challenge',
+                        challengedPlayerId: this.props.activePlayer.id,
+                        challengedPlayerUn: this.props.activePlayer.username,
+                        challengingPlayerId: this.props.player.id,
+                        challengingPlayerUn: this.props.player.username,
+                        challengedCard: msg.message.associatedCard,
+                        action: msg.message.action,
+                      },
+                      channel: this.props.gameChannel
+                    })
+                  } else {
+                    console.log("Letting it slide")
+                  }
+                })
               }
               // include buttons to counter OR challenge
               else if (msg.message.associatedCard && msg.message.counterCard) {
@@ -153,6 +193,8 @@ class Game extends React.Component {
                   testBtn2.innerHTML = 'Test2'
                   testBtn2.addEventListener('click', () => {
                     console.log('test2')
+                    // r will be {}
+                    Swal.close()
                   })
                   testBtn2.className = "swal2-confirm swal2-styled"
                   actions.append(testBtn2)
@@ -521,6 +563,7 @@ class Game extends React.Component {
     this.props.deck.push(oldCard)
     const newCard = this.shuffleDeck(this.props.deck, true)
     const aOrAn = /[AEIOU]/.test(newCard.name.charAt(0)) ? "an" : "a"
+    console.log(`You shuffled in your ${oldCard.name} and got ${aOrAn} ${newCard.name}!`)
     Swal.fire({
       title: `You shuffled in your ${oldCard.name} and got ${aOrAn} ${newCard.name}!`,
       timer: 2000,

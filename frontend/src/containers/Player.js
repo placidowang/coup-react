@@ -45,9 +45,10 @@ class Player extends React.Component {
         break
       case 'Tax':
         if (this.props.treasury >= 3) {
-          this.updateCoins(3)
-          this.updateTreasury(-3)
-          this.endTurn()
+          this.alertPlayers(action, 'Duke', undefined)
+          // this.updateCoins(3)
+          // this.updateTreasury(-3)
+          // this.endTurn()
         } else {
           Swal.fire('Not enough coins in Treasury!')
           console.error('Not enough coins in Treasury')
