@@ -188,7 +188,7 @@ class Game extends React.Component {
                     console.log('clicked test button')
                   })
 
-                  const actions = document.querySelector('.swal2-actions')
+                  const actionsDiv = document.querySelector('.swal2-actions')
                   const testBtn2 = document.createElement('button')
                   testBtn2.innerHTML = 'Test2'
                   testBtn2.addEventListener('click', () => {
@@ -197,7 +197,7 @@ class Game extends React.Component {
                     Swal.close()
                   })
                   testBtn2.className = "swal2-confirm swal2-styled"
-                  actions.append(testBtn2)
+                  actionsDiv.append(testBtn2)
                 }
               })
               .then(r => {

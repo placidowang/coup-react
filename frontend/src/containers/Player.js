@@ -55,7 +55,7 @@ class Player extends React.Component {
         }
         break
       case 'Coup':
-        this.targetPlayer()
+        this.targetPlayer(action)
         break
 
       default:
@@ -90,7 +90,33 @@ class Player extends React.Component {
     this.updatePlayer()
   }
 
-  targetPlayer = () => {
+  targetPlayer = (action) => {
+    console.log(`Using ${action}. Choose a player to target.`)
+    // swal with buttons for now, can later convert to onClick opponent div w/ hover effect
+    Swal.fire({
+      title: `Choose an opponent to ${action}.`,
+      // showConfirmButton: false,
+      allowOutsideClick: false,
+      timer: 10000,
+      onBeforeOpen: () => {
+        // console.log(this.props.players)
+        const actionsDiv = document.querySelector('.swal2-actions')
+        const opponents = this.props.players.filter(player => player.id !== this.props.player.id)
+        // opponents.forEach(o => console.log(o.username))
+        opponents.forEach(opponent => {
+          const btn = document.createElement('button')
+          btn.innerText = opponent.username
+          btn.className = "swal2-confirm swal2-styled"
+          // let id = opponent.id
+          btn.addEventListener('click', () => {
+            console.log(opponent.id)
+          })
+          actionsDiv.append(btn)
+        })
+      }
+    })
+
+
 
   }
 
@@ -152,7 +178,7 @@ const mapStateToProps = (state) => {
     pubnub: state.connectionReducer.pubnub,
     gameChannel: state.connectionReducer.gameChannel,
     isHost: state.connectionReducer.isHost,
-    players: state.connectionReducer.players,
+    players: state.gameReducer.players,
     deck: state.gameReducer.deck,
     treasury: state.gameReducer.treasury,
     player: state.playerReducer,
