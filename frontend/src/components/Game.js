@@ -43,9 +43,54 @@ class Game extends React.Component {
             break
           case 'endTurn':
             // Swal.close()
+            const currentActivePlayerId = this.props.activePlayer.id
             this.props.endTurn()
-            console.log(`${this.props.players[this.props.whosTurnIsIt].username}'s turn.`)
             this.props.setActivePlayer()
+            if (this.props.activePlayer.id === currentActivePlayerId && this.isYourTurn()) {
+              Swal.close()
+              Swal.fire({
+                title: 'u win gj gg',
+                confirmButtonText: 'New Game?',
+                allowOutsideClick: false
+              })
+            }
+            console.log(`${this.props.players[this.props.whosTurnIsIt].username}'s turn.`)
+            break
+          case 'target':
+            const targetPlayer = this.props.players.find(player => player.id === msg.message.targetPlayerId)
+            if (this.props.player.id === targetPlayer.id) {
+              // console.log(msg.message.action)
+              // console.log(msg.message.associatedCard)
+              // console.log(msg.message.counterCards)
+              if (msg.message.action === 'Coup') {
+                Swal.fire({
+                  title: `${this.props.activePlayer.username} couped you!`,
+                  showConfirmButton: false,
+                  allowOutsideClick: false,
+                  timer: 2000,
+                })
+                .then(r => {this.loseCard()})
+              } else {
+                Swal.fire({
+                  title: `${this.props.activePlayer.username} is trying to use ${msg.message.action} on you!`
+                })
+              }
+
+            } else if (this.isYourTurn()) {
+              if (msg.message.action === 'Coup') {
+                Swal.fire({
+                  title: `You couped ${targetPlayer.username}!`,
+                  showConfirmButton: false,
+                  timer: 2000,
+                })
+              } else {
+                Swal.fire({
+                  title: `Waiting for ${targetPlayer.username}.`,
+                  showConfirmButton: false,
+                  allowOutsideClick: false,
+                })
+              }
+            }
             break
           case 'alert':
             if (!this.isYourTurn()) {

@@ -172,7 +172,7 @@ class Lobby extends React.Component {
     // this.props.players.map(player => console.log(player.username))
     return(
       <div>
-        <p>Welcome, <span style={{color: 'red', fontSize: 40}}>{this.props.player.username}</span>.</p>
+        <p>Welcome, AAAAAAA <span style={{color: 'red', fontSize: 40}}>{this.props.player.username}</span>.</p>
 
         {!this.props.lobbyChannel &&
           <div>
@@ -189,6 +189,9 @@ class Lobby extends React.Component {
         {this.props.lobbyChannel &&
           <div>
             <p>Room ID <br/>{this.props.roomId}</p>
+            <br/>
+            <button onClick={this.startGame} className='start'>START</button>
+            <br/>
             <div className='lobby-player-list-container'>
               {/* <p>{this.props.player.username + ' (You)'}</p> */}
               <div className='lobby-player-list'>
@@ -197,7 +200,6 @@ class Lobby extends React.Component {
               </div>
             </div>
 
-            <br/><button onClick={this.startGame} className='start'>START</button>
             {/* <button onClick={() => this.testMsg('i am hostman')}>send him a message</button> */}
             {/* <button onClick={()=>this.testMsg('hey host')}>msg</button> */}
             {/* <button onClick={this.hereNow}>who here</button> */}

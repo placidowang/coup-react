@@ -57,7 +57,12 @@ class Player extends React.Component {
       case 'Coup':
         this.targetPlayer(action)
         break
-
+      case 'Assassinate':
+        this.targetPlayer(action, 'Assassin', 'Contessa')
+        break
+      case 'Steal':
+        this.targetPlayer(action, 'Captain', 'Captain', 'Ambassador')
+        break
       default:
         console.error('Invalid player action')
     }
@@ -90,14 +95,16 @@ class Player extends React.Component {
     this.updatePlayer()
   }
 
-  targetPlayer = (action) => {
+  targetPlayer = (action, associatedCard = undefined, ...counterCards) => {
     console.log(`Using ${action}. Choose a player to target.`)
     // swal with buttons for now, can later convert to onClick opponent div w/ hover effect
     Swal.fire({
-      title: `Choose an opponent to ${action}.`,
-      // showConfirmButton: false,
+      title: `Choose an opponent to use ${action} on.`,
+      showConfirmButton: false,
+      showCancelButton: true,
       allowOutsideClick: false,
       timer: 10000,
+      timerProgressBar: true,
       onBeforeOpen: () => {
         // console.log(this.props.players)
         const actionsDiv = document.querySelector('.swal2-actions')
@@ -110,6 +117,18 @@ class Player extends React.Component {
           // let id = opponent.id
           btn.addEventListener('click', () => {
             console.log(opponent.id)
+            Swal.close()
+
+            this.props.pubnub.publish({
+              message: {
+                type: 'target',
+                action: action,
+                associatedCard: associatedCard,
+                counterCards: counterCards,
+                targetPlayerId: opponent.id,
+              },
+              channel: this.props.gameChannel
+            })
           })
           actionsDiv.append(btn)
         })
