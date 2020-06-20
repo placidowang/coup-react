@@ -172,7 +172,7 @@ class Lobby extends React.Component {
     // this.props.players.map(player => console.log(player.username))
     return(
       <div>
-        <p>Welcome, AAAAAAA <span style={{color: 'red', fontSize: 40}}>{this.props.player.username}</span>.</p>
+        <p>Welcome, <span style={{color: 'red', fontSize: 40}}>{this.props.player.username}</span>.</p>
 
         {!this.props.lobbyChannel &&
           <div>
