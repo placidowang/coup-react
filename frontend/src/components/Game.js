@@ -78,8 +78,10 @@ class Game extends React.Component {
 
             } else if (this.isYourTurn()) {
               if (msg.message.action === 'Coup') {
+                this.updateCoins(-7)
+                this.updateTreasury(7)
                 Swal.fire({
-                  title: `You couped ${targetPlayer.username}!`,
+                  title: `You spent 7 coins and couped ${targetPlayer.username}!`,
                   showConfirmButton: false,
                   timer: 2000,
                 })
@@ -190,14 +192,13 @@ class Game extends React.Component {
               .then(r => {
                 if (r.dismiss === 'timer') {
                   Swal.fire({
-                    title: `You used ${msg.message.action}!`,
+                    title: `You use ${msg.message.action}!`,
                     showConfirmButton: false,
                     timer: 1500,
                     icon: 'success'
                   })
-                  // case switch reward depending on action
-                  this.updateCoins(2)
-                  this.updateTreasury(-2)
+                  this.useAction(msg.message.action)
+                  // should only end turn if an assassination is uncontested; may need to be moved to useAction() as a conditional
                   this.endTurn()
                 }
               })
@@ -376,14 +377,26 @@ class Game extends React.Component {
             break
           case 'challengedPlayerWon':
             if (this.props.player.id === msg.message.challengedPlayerId) {
-              Swal.fire({
-                title: `You show your ${msg.message.challengedCard}, winning the challenge!`,
-                text: `${msg.message.challengingPlayerUn} loses a card and doesn't get to ${msg.message.action}.`,
-                icon: 'success',
-                timer: globalSwalTimer,
-                timerProgressBar: true,
-              })
-              .then(r => this.getNewCard(msg.message.challengedCard))
+              if (this.isYourTurn()) {
+                this.useAction(msg.message.action)
+                Swal.fire({
+                  title: `You show your ${msg.message.challengedCard}, winning the challenge!`,
+                  text: `You use ${msg.message.action} and ${msg.message.challengingPlayerUn} loses a card.`,
+                  icon: 'success',
+                  timer: globalSwalTimer,
+                  timerProgressBar: true,
+                })
+                .then(r => {this.getNewCard(msg.message.challengedCard)})
+              } else if (!this.isYourTurn()) {
+                Swal.fire({
+                  title: `You show your ${msg.message.challengedCard}, winning the challenge!`,
+                  text: `${msg.message.challengingPlayerUn} loses a card and doesn't get to ${msg.message.action}.`,
+                  icon: 'success',
+                  timer: globalSwalTimer,
+                  timerProgressBar: true,
+                })
+                .then(r => this.getNewCard(msg.message.challengedCard))
+              }
             } else if (this.props.player.id === msg.message.challengingPlayerId) {
               if (this.props.player.hand.filter(card => card.isRevealed === true).length === 1) {
                 Swal.fire({
@@ -425,21 +438,24 @@ class Game extends React.Component {
                 .then(r => this.loseCard())  
               }
             } else if (this.props.player.id === msg.message.challengingPlayerId) {
-              // Swal.close()
-
-              // switch case rewards per action type
-              this.updateCoins(2)
-              this.updateTreasury(-2)
-
-              Swal.fire({
-                title: `You won the challenge! You use ${msg.message.action}.`,
-                text: `${msg.message.challengedPlayerUn} loses a card.`,
-                icon: 'success',
-                timer: globalSwalTimer,
-                timerProgressBar: true,
-              })
-              // don't show card
-              // .then(r => this.getNewCard(msg.message.challengedCard))
+              if (this.isYourTurn()) {
+                this.useAction(msg.message.action)
+                Swal.fire({
+                  title: `You won the challenge! You use ${msg.message.action}.`,
+                  text: `${msg.message.challengedPlayerUn} loses a card.`,
+                  icon: 'success',
+                  timer: globalSwalTimer,
+                  timerProgressBar: true,
+                })
+              } else if (!this.isYourTurn()) {
+                Swal.fire({
+                  title: `You won the challenge! You blocked ${msg.message.challengedPlayerUn}'s ${msg.message.action}!`,
+                  text: `${msg.message.challengedPlayerUn} loses a card.`,
+                  icon: 'success',
+                  timer: globalSwalTimer,
+                  timerProgressBar: true,
+                })
+              }
             }
             break
           case 'log':
@@ -548,6 +564,32 @@ class Game extends React.Component {
   updateCoins = async(amt) => {
     await this.props.updateCoins(amt)
     this.updatePlayer()
+  }
+
+  // may need to move up or down
+  useAction = (action, targetPlayerId = NaN) => {
+    console.log('Using ' + action)
+    switch (action) {
+      case 'Foreign Aid':
+        this.updateCoins(2)
+        this.updateTreasury(-2)
+        break
+      case 'Coup':
+
+        break
+      case 'Tax':
+        this.updateCoins(3)
+        this.updateTreasury(-3)
+        break
+      case 'Assassinate':
+        break
+      case 'Exchange':
+        break
+      case 'Steal':
+        break
+      default:
+        console.error('Invalid action.')
+    }
   }
 
   // pick card to reveal, or lose one randomly based on timer

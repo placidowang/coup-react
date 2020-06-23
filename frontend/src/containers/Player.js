@@ -18,8 +18,8 @@ class Player extends React.Component {
   }
 
   // don't need to account for turn anymore; actions are disabled if it's not your turn
-  takeAction = (action) => {
-    console.log(action)
+  handleClickAction = (action) => {
+    console.log('Attempting to use ' + action)
     switch (action) {
       case 'Income':
         if (this.props.treasury >= 1) {
@@ -35,9 +35,7 @@ class Player extends React.Component {
       case 'Foreign Aid':
         if (this.props.treasury >= 2) {
           this.alertPlayers(action, undefined, 'Duke')
-          // this.updateCoins(2)
-          // this.updateTreasury(-2)
-          // this.endTurn()
+
         } else {
           Swal.fire('Not enough coins in Treasury!')
           console.error('Not enough coins in Treasury')
@@ -46,16 +44,18 @@ class Player extends React.Component {
       case 'Tax':
         if (this.props.treasury >= 3) {
           this.alertPlayers(action, 'Duke', undefined)
-          // this.updateCoins(3)
-          // this.updateTreasury(-3)
-          // this.endTurn()
+
         } else {
           Swal.fire('Not enough coins in Treasury!')
           console.error('Not enough coins in Treasury')
         }
         break
       case 'Coup':
-        this.targetPlayer(action)
+        if (this.props.player.coins >= 7) {
+          this.targetPlayer(action)
+        } else {
+          Swal.fire(`You need 7 coins to Coup.`)
+        }
         break
       case 'Assassinate':
         this.targetPlayer(action, 'Assassin', 'Contessa')
@@ -139,12 +139,14 @@ class Player extends React.Component {
 
   }
 
+  // alertPlayers = (action, counterAction, associatedCard, counterCard) => {
   alertPlayers = (action, associatedCard, counterCard) => {
     this.props.pubnub.publish({
       message: {
         type: 'alert',
         // fromPlayer: this.props.player,
         action: action,
+        // counterAction: counterAction,
         // message: msg,
         associatedCard: associatedCard,
         counterCard: counterCard,
@@ -183,7 +185,7 @@ class Player extends React.Component {
         <div className='actions'>Actions: 
           {actions.map(action => 
             <div className='actions' key={action.action}>
-              <button onClick={e => this.takeAction(e.target.value)} value={action.action} disabled={this.isYourTurn() ? '' : 'disabled'}>{action.action}</button>
+              <button onClick={e => this.handleClickAction(e.target.value)} value={action.action} disabled={this.isYourTurn() ? '' : 'disabled'}>{action.action}</button>
             </div>
           )}
         </div>
