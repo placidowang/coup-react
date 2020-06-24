@@ -58,11 +58,8 @@ class Game extends React.Component {
             break
           case 'target':
             const targetPlayer = this.props.players.find(player => player.id === msg.message.targetPlayerId)
-            if (this.props.player.id === targetPlayer.id) {
-              // console.log(msg.message.action)
-              // console.log(msg.message.associatedCard)
-              // console.log(msg.message.counterCards)
-              if (msg.message.action === 'Coup') {
+            if (msg.message.action === 'Coup') {
+              if (this.props.player.id === targetPlayer.id) {
                 Swal.fire({
                   title: `${this.props.activePlayer.username} couped you!`,
                   showConfirmButton: false,
@@ -70,14 +67,7 @@ class Game extends React.Component {
                   timer: 2000,
                 })
                 .then(r => {this.loseCard()})
-              } else {
-                Swal.fire({
-                  title: `${this.props.activePlayer.username} is trying to use ${msg.message.action} on you!`
-                })
-              }
-
-            } else if (this.isYourTurn()) {
-              if (msg.message.action === 'Coup') {
+              } else if (this.isYourTurn()) {
                 this.updateCoins(-7)
                 this.updateTreasury(7)
                 Swal.fire({
@@ -85,7 +75,14 @@ class Game extends React.Component {
                   showConfirmButton: false,
                   timer: 2000,
                 })
-              } else {
+              }
+
+            } else {
+              if (!this.isYourTurn()) {
+                Swal.fire({
+                  title: `${this.props.activePlayer.username} is trying to use ${msg.message.action} on you!`
+                })
+              } else if (this.isYourTurn()) {
                 Swal.fire({
                   title: `Waiting for ${targetPlayer.username}.`,
                   showConfirmButton: false,
@@ -93,6 +90,20 @@ class Game extends React.Component {
                 })
               }
             }
+
+            // } else  {
+            //   if (msg.message.action === 'Coup') {
+            //     this.updateCoins(-7)
+            //     this.updateTreasury(7)
+            //     Swal.fire({
+            //       title: `You spent 7 coins and couped ${targetPlayer.username}!`,
+            //       showConfirmButton: false,
+            //       timer: 2000,
+            //     })
+            //   } else {
+
+            //   }
+            // }
             break
           case 'alert':
             if (!this.isYourTurn()) {
@@ -595,6 +606,11 @@ class Game extends React.Component {
   // pick card to reveal, or lose one randomly based on timer
   loseCard = () => {
     /* if player only has one unrevealed card, player loses the game */
+    if (this.props.player.hand.filter(card => card.isRevealed === true).length === 1) {
+      this.gameOver()
+      return
+    }
+
     Swal.fire({
       title: `Pick a card to lose.`,
       focusConfirm: false,
@@ -670,7 +686,7 @@ class Game extends React.Component {
     })
   }
 
-  gameOver = () => {
+  gameOver = async() => {
     Swal.close()
     Swal.fire({
       title: 'Game over, man!',
@@ -682,9 +698,12 @@ class Game extends React.Component {
     const i = (this.props.player.hand[0].isRevealed) ? 1 : 0
     newHand[i] = {...newHand[i], isRevealed: true}
     this.props.updateHand(newHand)
+
     // skip player in turn order; cannot just remove player from players list or their cards will also be removed
+
+    // await next line? problem with determining next turn when a player is defeated
     this.props.gameOver()
-    this.updatePlayer()
+    await this.updatePlayer()
     this.endTurn()
   }
 
