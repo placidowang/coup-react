@@ -19,7 +19,7 @@ class Game extends React.Component {
     }
 
     // if (this.props.gameChannel) {
-      this.props.pubnub.getMessage(this.props.gameChannel, (msg) => {
+      this.props.pubnub.getMessage(this.props.gameChannel, async(msg) => {
         switch (msg.message.type) {
           case 'updateDeck':
             this.props.updateDeck(msg.message.updatedDeck)
@@ -77,36 +77,92 @@ class Game extends React.Component {
                 })
               }
 
+              // if targeted action is not Coup, i.e. Assassinate/Steal
             } else {
-              if (!this.isYourTurn()) {
+              if (this.props.player.id === targetPlayer.id) {
+                let counterCard = undefined
+
                 Swal.fire({
-                  title: `${this.props.activePlayer.username} is trying to use ${msg.message.action} on you!`
+                  title: `${this.props.activePlayer.username} is trying to use ${msg.message.action} on you with a ${msg.message.associatedCard}!`,
+                  timer: globalSwalTimer,
+                  timerProgressBar: true,
+                  confirmButtonText: 'CHALLENGE',
+                  showCancelButton: true,
+                  cancelButtonText: `Let ${this.props.activePlayer.username} use ${msg.message.action}. :(`,
+                  html: `<span class='swal2-text'>Letting ${this.props.activePlayer.username} use ${msg.message.action} in <b></b></span>`,
+                  onBeforeOpen: () => {
+                    setInterval(() => {
+                      const content = Swal.getContent()
+                      if (content) {
+                        const b = content.querySelector('b')
+                        if (b && Swal.getTimerLeft()) {
+                          b.textContent = Math.ceil(Swal.getTimerLeft() / 1000)
+                        }
+                      }
+                    }, 100)
+
+                    const actionsDiv = Swal.getActions()
+
+                    for (const card of msg.message.counterCards) {
+                      const counterCardBtn = document.createElement('button')
+                      counterCardBtn.innerHTML = `BLOCK with ${card}`
+                      counterCardBtn.className = "swal2-confirm swal2-styled"
+                      // eslint-disable-next-line
+                      counterCardBtn.addEventListener('click', () => {
+                        counterCard = card
+                        Swal.close()
+                      })
+                      actionsDiv.prepend(counterCardBtn)
+                    }
+                  }
                 })
+                .then(r => {
+                  // console.log(r)
+                  if (counterCard) {
+                    console.log(`Attempting to block with a ${counterCard}.`)
+
+                  } else if (r.value) {
+                    console.log('CHALLENGE!')
+                  } else if (r.dismiss) {
+                    console.log('ok :(')
+                  }
+
+                })
+
+                // console.log(`testValue is: ${testValue}`)
+
+                // .then(r => {
+                //   console.log(r)
+                //   if (r.value) {
+                //     this.props.pubnub.publish({
+                //       message: {
+                //         type: 'counter',
+                //         action: msg.message.action,
+                //         counterCard: msg.message.counterCard,
+                //         counteredPlayerId: this.props.activePlayer.id,
+                //         counteredPlayerUn: this.props.activePlayer.username,
+                //         counteringPlayerId: this.props.player.id,
+                //         counteringPlayerUn: this.props.player.username,
+                //       },
+                //       channel: this.props.gameChannel
+                //     })
+                //   } else {
+                //     console.log("Letting it slide")
+                //   }
+                // })
               } else if (this.isYourTurn()) {
                 Swal.fire({
                   title: `Waiting for ${targetPlayer.username}.`,
                   showConfirmButton: false,
                   allowOutsideClick: false,
+                  timer: globalSwalTimer,
+                  timerProgressBar: true,
                 })
               }
             }
-
-            // } else  {
-            //   if (msg.message.action === 'Coup') {
-            //     this.updateCoins(-7)
-            //     this.updateTreasury(7)
-            //     Swal.fire({
-            //       title: `You spent 7 coins and couped ${targetPlayer.username}!`,
-            //       showConfirmButton: false,
-            //       timer: 2000,
-            //     })
-            //   } else {
-
-            //   }
-            // }
             break
           case 'alert':
-            if (!this.isYourTurn()) {
+            if (!this.isYourTurn() && !this.props.player.gameOver) {
               if (!msg.message.associatedCard && msg.message.counterCard) {
                 Swal.fire({
                   title: `${this.props.activePlayer.username} is trying to use ${msg.message.action}!`,
@@ -114,7 +170,7 @@ class Game extends React.Component {
                   timerProgressBar: true,
                   showCancelButton: true,
                   cancelButtonText: `Let ${this.props.activePlayer.username} use ${msg.message.action}... this time.`,
-                  confirmButtonText: `BLOCK ${this.props.activePlayer.username} with a ${msg.message.counterCard}.`,
+                  confirmButtonText: `BLOCK with a ${msg.message.counterCard}.`,
                   html: `<span class='swal2-text'>Letting ${this.props.activePlayer.username} use ${msg.message.action} in <b></b></span>`,
                   onBeforeOpen: () => {
                     setInterval(() => {
@@ -188,10 +244,11 @@ class Game extends React.Component {
                 })
               }
               // include buttons to counter OR challenge
+              // only for Exchange, other actions are targeted
               else if (msg.message.associatedCard && msg.message.counterCard) {
                 
               }
-            } else {
+            } else if (this.isYourTurn()) {
               Swal.fire({
                 title: 'Waiting for other players.',
                 allowOutsideClick: false,
@@ -225,9 +282,9 @@ class Game extends React.Component {
                 confirmButtonText: 'CHALLENGE',
                 allowOutsideClick: false,
                 allowEscapeKey: false,
-                timer: 9999999,
+                timer: globalSwalTimer,
                 timerProgressBar: true,
-                html: "<span class='swal2-text'>Backing down in <b></b></span><button id='testBtn'>sup</button>",
+                html: "<span class='swal2-text'>Backing down in <b></b></span>",
                 onBeforeOpen: () => {
                   const content = Swal.getContent()
                   setInterval(() => {
@@ -239,22 +296,6 @@ class Game extends React.Component {
                       
                     }
                   }, 100)
-                  
-                  const testBtn = content.querySelector('#testBtn')
-                  testBtn.addEventListener('click', () => {
-                    console.log('clicked test button')
-                  })
-
-                  const actionsDiv = document.querySelector('.swal2-actions')
-                  const testBtn2 = document.createElement('button')
-                  testBtn2.innerHTML = 'Test2'
-                  testBtn2.addEventListener('click', () => {
-                    console.log('test2')
-                    // r will be {}
-                    Swal.close()
-                  })
-                  testBtn2.className = "swal2-confirm swal2-styled"
-                  actionsDiv.append(testBtn2)
                 }
               })
               .then(r => {

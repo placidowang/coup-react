@@ -61,7 +61,7 @@ class Player extends React.Component {
         this.targetPlayer(action, 'Assassin', 'Contessa')
         break
       case 'Steal':
-        this.targetPlayer(action, 'Captain', 'Captain', 'Ambassador')
+        this.targetPlayer(action, 'Captain', 'Ambassador', 'Captain')
         break
       default:
         console.error('Invalid player action')
@@ -107,9 +107,11 @@ class Player extends React.Component {
       timerProgressBar: true,
       onBeforeOpen: () => {
         // console.log(this.props.players)
-        const actionsDiv = document.querySelector('.swal2-actions')
-        const opponents = this.props.players.filter(player => player.id !== this.props.player.id)
-        // opponents.forEach(o => console.log(o.username))
+        // const actionsDiv = document.querySelector('.swal2-actions')
+        const actionsDiv = Swal.getActions()
+
+        const opponents = this.props.players.filter(player => player.id !== this.props.player.id && !player.gameOver)
+
         opponents.forEach(opponent => {
           const btn = document.createElement('button')
           btn.innerText = opponent.username
