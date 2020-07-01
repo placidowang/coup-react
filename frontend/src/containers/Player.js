@@ -58,7 +58,14 @@ class Player extends React.Component {
         }
         break
       case 'Assassinate':
-        this.targetPlayer(action, 'Assassin', 'Contessa')
+        if (this.props.player.coins >= 3) {
+          this.targetPlayer(action, 'Assassin', 'Contessa')
+        } else {
+          Swal.fire(`You need 3 coins to Assassinate.`)
+        }
+        break
+      case 'Exchange':
+        this.alertPlayers(action, 'Ambassador', undefined)
         break
       case 'Steal':
         this.targetPlayer(action, 'Captain', 'Ambassador', 'Captain')

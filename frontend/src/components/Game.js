@@ -18,6 +18,7 @@ class Game extends React.Component {
       })
     }
 
+    let targetPlayer
     // if (this.props.gameChannel) {
       this.props.pubnub.getMessage(this.props.gameChannel, async(msg) => {
         switch (msg.message.type) {
@@ -57,17 +58,26 @@ class Game extends React.Component {
             console.log(`${this.props.players[this.props.whosTurnIsIt].username}'s turn.`)
             break
           case 'target':
-            const targetPlayer = this.props.players.find(player => player.id === msg.message.targetPlayerId)
+            targetPlayer = this.props.players.find(player => player.id === msg.message.targetPlayerId)
             if (msg.message.action === 'Coup') {
-              if (this.props.player.id === targetPlayer.id) {
-                Swal.fire({
-                  title: `${this.props.activePlayer.username} couped you!`,
-                  showConfirmButton: false,
-                  allowOutsideClick: false,
-                  timer: 2000,
-                })
-                .then(r => {this.loseCard()})
-              } else if (this.isYourTurn()) {
+              // if (this.props.player.id === targetPlayer.id) {
+              //   Swal.fire({
+              //     title: `${this.props.activePlayer.username} couped you!`,
+              //     showConfirmButton: false,
+              //     allowOutsideClick: false,
+              //     timer: 2000,
+              //   })
+              //   .then(r => {this.loseCard()})
+              // } else if (this.isYourTurn()) {
+              //   this.updateCoins(-7)
+              //   this.updateTreasury(7)
+              //   Swal.fire({
+              //     title: `You spent 7 coins and couped ${targetPlayer.username}!`,
+              //     showConfirmButton: false,
+              //     timer: 2000,
+              //   })
+              // }
+              if (this.isYourTurn()) {
                 this.updateCoins(-7)
                 this.updateTreasury(7)
                 Swal.fire({
@@ -75,6 +85,7 @@ class Game extends React.Component {
                   showConfirmButton: false,
                   timer: 2000,
                 })
+                this.useAction(msg.message.action, targetPlayer.id)
               }
 
               // if targeted action is not Coup, i.e. Assassinate/Steal
@@ -120,43 +131,60 @@ class Game extends React.Component {
                   // console.log(r)
                   if (counterCard) {
                     console.log(`Attempting to block with a ${counterCard}.`)
-
+                    this.props.pubnub.publish({
+                      message: {
+                        type: 'counter',
+                        action: msg.message.action,
+                        counterCard: counterCard,
+                        counteredPlayerId: this.props.activePlayer.id,
+                        counteredPlayerUn: this.props.activePlayer.username,
+                        counteringPlayerId: this.props.player.id,
+                        counteringPlayerUn: this.props.player.username,
+                      },
+                      channel: this.props.gameChannel
+                    })
                   } else if (r.value) {
-                    console.log('CHALLENGE!')
+                    console.log('Sending challenge to ' + msg.message.counteringPlayerUn)
+                    this.props.pubnub.publish({
+                      message: {
+                        type: 'challenge',
+                        challengedPlayerId: this.props.activePlayer.id,
+                        challengedPlayerUn: this.props.activePlayer.username,
+                        challengingPlayerId: this.props.player.id,
+                        challengingPlayerUn: this.props.player.username,
+                        challengedCard: msg.message.associatedCard,
+                        action: msg.message.action,
+                      },
+                      channel: this.props.gameChannel
+                    })
                   } else if (r.dismiss) {
                     console.log('ok :(')
                   }
-
                 })
-
-                // console.log(`testValue is: ${testValue}`)
-
-                // .then(r => {
-                //   console.log(r)
-                //   if (r.value) {
-                //     this.props.pubnub.publish({
-                //       message: {
-                //         type: 'counter',
-                //         action: msg.message.action,
-                //         counterCard: msg.message.counterCard,
-                //         counteredPlayerId: this.props.activePlayer.id,
-                //         counteredPlayerUn: this.props.activePlayer.username,
-                //         counteringPlayerId: this.props.player.id,
-                //         counteringPlayerUn: this.props.player.username,
-                //       },
-                //       channel: this.props.gameChannel
-                //     })
-                //   } else {
-                //     console.log("Letting it slide")
-                //   }
-                // })
               } else if (this.isYourTurn()) {
+                let title = `You Stole from ${targetPlayer.username}!`
+                if (msg.message.action === 'Assassinate') {
+                  this.updateCoins(-3)
+                  this.updateTreasury(3)
+                  title = `You Assassinated ${targetPlayer.username}!`
+                }
                 Swal.fire({
                   title: `Waiting for ${targetPlayer.username}.`,
                   showConfirmButton: false,
                   allowOutsideClick: false,
                   timer: globalSwalTimer,
                   timerProgressBar: true,
+                })
+                .then(r => {
+                  if (r.dismiss === 'timer') {
+                    Swal.fire({
+                      title: title,
+                      showConfirmButton: false,
+                      timer: 1500,
+                      icon: 'success'
+                    })
+                    this.useAction(msg.message.action, targetPlayer.id)
+                  }
                 })
               }
             }
@@ -225,7 +253,7 @@ class Game extends React.Component {
                 })
                 .then(r => {
                   if (r.value) {
-                    console.log('Sending challenge to ' + msg.message.counteringPlayerUn)
+                    console.log('Sending challenge to ' + this.props.activePlayer.username)
                     this.props.pubnub.publish({
                       message: {
                         type: 'challenge',
@@ -245,6 +273,7 @@ class Game extends React.Component {
               }
               // include buttons to counter OR challenge
               // only for Exchange, other actions are targeted
+              // nvm, Exchange belongs in cards with associated car and no counter card
               else if (msg.message.associatedCard && msg.message.counterCard) {
                 
               }
@@ -266,8 +295,6 @@ class Game extends React.Component {
                     icon: 'success'
                   })
                   this.useAction(msg.message.action)
-                  // should only end turn if an assassination is uncontested; may need to be moved to useAction() as a conditional
-                  this.endTurn()
                 }
               })
             }
@@ -344,7 +371,9 @@ class Game extends React.Component {
               })
             } else {
               console.log(`${msg.message.counteringPlayerUn} has attempted to block ${msg.message.counteredPlayerUn}.`)
-              Swal.close()
+              if (!this.props.player.gameOver) {
+                Swal.close()
+              }
             }
             break
           case 'challenge':
@@ -424,13 +453,14 @@ class Game extends React.Component {
               })
             } else {
               console.log(`${msg.message.challengedPlayerUn} has been challenged by ${msg.message.challengingPlayerUn}.`)
-              Swal.close()
+              if (!this.props.player.gameOver) {
+                Swal.close()
+              }
             }
             break
           case 'challengedPlayerWon':
             if (this.props.player.id === msg.message.challengedPlayerId) {
               if (this.isYourTurn()) {
-                this.useAction(msg.message.action)
                 Swal.fire({
                   title: `You show your ${msg.message.challengedCard}, winning the challenge!`,
                   text: `You use ${msg.message.action} and ${msg.message.challengingPlayerUn} loses a card.`,
@@ -438,7 +468,10 @@ class Game extends React.Component {
                   timer: globalSwalTimer,
                   timerProgressBar: true,
                 })
-                .then(r => {this.getNewCard(msg.message.challengedCard)})
+                .then(r => {
+                  this.useAction(msg.message.action, msg.message.targetPlayerId)
+                  this.getNewCard(msg.message.challengedCard)
+                })
               } else if (!this.isYourTurn()) {
                 Swal.fire({
                   title: `You show your ${msg.message.challengedCard}, winning the challenge!`,
@@ -491,7 +524,7 @@ class Game extends React.Component {
               }
             } else if (this.props.player.id === msg.message.challengingPlayerId) {
               if (this.isYourTurn()) {
-                this.useAction(msg.message.action)
+                this.useAction(msg.message.action, msg.message.targetPlayerId)
                 Swal.fire({
                   title: `You won the challenge! You use ${msg.message.action}.`,
                   text: `${msg.message.challengedPlayerUn} loses a card.`,
@@ -500,6 +533,7 @@ class Game extends React.Component {
                   timerProgressBar: true,
                 })
               } else if (!this.isYourTurn()) {
+
                 Swal.fire({
                   title: `You won the challenge! You blocked ${msg.message.challengedPlayerUn}'s ${msg.message.action}!`,
                   text: `${msg.message.challengedPlayerUn} loses a card.`,
@@ -508,6 +542,40 @@ class Game extends React.Component {
                   timerProgressBar: true,
                 })
               }
+            }
+            break
+          case 'useTargetedAction':
+            // targetPlayer = this.props.players.find(player => player.id === msg.message.targetPlayerId)
+            if (this.props.player.id === msg.message.targetPlayerId) {
+              let title = `${this.props.activePlayer.username} Couped you!`
+              switch (msg.message.action) {
+                case 'Assassinate':
+                  title = `${this.props.activePlayer.username} Assassinated you!`
+                // eslint-disable-next-line
+                case 'Coup':
+                  Swal.fire({
+                    title: title,
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    timer: 2000,
+                  })
+                  .then(r => {this.loseCard()})
+                  break
+                case 'Steal':
+                  this.updateCoins(-2)
+                  Swal.fire({
+                    title: `${this.props.activePlayer.username} Stole from you!`,
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    timer: 2000,
+                  })
+                  this.endTurn()
+                  break
+                default:
+                  console.error(`Invalid Targeted Action: ${msg.message.action}`)
+              }
+            } else if (this.isYourTurn()) {
+
             }
             break
           case 'log':
@@ -622,22 +690,33 @@ class Game extends React.Component {
   useAction = (action, targetPlayerId = NaN) => {
     console.log('Using ' + action)
     switch (action) {
+      // incone is handled in Player.js
       case 'Foreign Aid':
         this.updateCoins(2)
         this.updateTreasury(-2)
-        break
-      case 'Coup':
-
+        this.endTurn()
         break
       case 'Tax':
         this.updateCoins(3)
         this.updateTreasury(-3)
-        break
-      case 'Assassinate':
-        break
-      case 'Exchange':
+        this.endTurn()
         break
       case 'Steal':
+        this.updateCoins(2)
+      // eslint-disable-next-line
+      case 'Coup':
+      case 'Assassinate':
+        this.props.pubnub.publish({
+          message: {
+            type: 'useTargetedAction',
+            action: action,
+            targetPlayerId: targetPlayerId
+          },
+          channel: this.props.gameChannel
+        })
+        break
+      case 'Exchange':
+
         break
       default:
         console.error('Invalid action.')
