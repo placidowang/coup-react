@@ -59,34 +59,15 @@ class Game extends React.Component {
             break
           case 'target':
             targetPlayer = this.props.players.find(player => player.id === msg.message.targetPlayerId)
-            if (msg.message.action === 'Coup') {
-              // if (this.props.player.id === targetPlayer.id) {
-              //   Swal.fire({
-              //     title: `${this.props.activePlayer.username} couped you!`,
-              //     showConfirmButton: false,
-              //     allowOutsideClick: false,
-              //     timer: 2000,
-              //   })
-              //   .then(r => {this.loseCard()})
-              // } else if (this.isYourTurn()) {
-              //   this.updateCoins(-7)
-              //   this.updateTreasury(7)
-              //   Swal.fire({
-              //     title: `You spent 7 coins and couped ${targetPlayer.username}!`,
-              //     showConfirmButton: false,
-              //     timer: 2000,
-              //   })
-              // }
-              if (this.isYourTurn()) {
-                this.updateCoins(-7)
-                this.updateTreasury(7)
-                Swal.fire({
-                  title: `You spent 7 coins and couped ${targetPlayer.username}!`,
-                  showConfirmButton: false,
-                  timer: 2000,
-                })
-                this.useAction(msg.message.action, targetPlayer.id)
-              }
+            if (msg.message.action === 'Coup' && this.isYourTurn()) {
+              this.updateCoins(-7)
+              this.updateTreasury(7)
+              Swal.fire({
+                title: `You spent 7 coins and Couped ${targetPlayer.username}!`,
+                showConfirmButton: false,
+                timer: 2000,
+              })
+              this.useAction(msg.message.action, targetPlayer.id)
 
               // if targeted action is not Coup, i.e. Assassinate/Steal
             } else {
@@ -162,11 +143,11 @@ class Game extends React.Component {
                   }
                 })
               } else if (this.isYourTurn()) {
-                let title = `You Stole from ${targetPlayer.username}!`
+                let title = `You Stole 2 coins from ${targetPlayer.username}!`
                 if (msg.message.action === 'Assassinate') {
                   this.updateCoins(-3)
                   this.updateTreasury(3)
-                  title = `You Assassinated ${targetPlayer.username}!`
+                  title = `You spent 3 coins and Assassinated ${targetPlayer.username}!`
                 }
                 Swal.fire({
                   title: `Waiting for ${targetPlayer.username}.`,
@@ -564,7 +545,7 @@ class Game extends React.Component {
                 case 'Steal':
                   this.updateCoins(-2)
                   Swal.fire({
-                    title: `${this.props.activePlayer.username} Stole from you!`,
+                    title: `${this.props.activePlayer.username} Stole 2 coins from you!`,
                     showConfirmButton: false,
                     allowOutsideClick: false,
                     timer: 2000,
