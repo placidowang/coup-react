@@ -143,11 +143,13 @@ class Game extends React.Component {
                   }
                 })
               } else if (this.isYourTurn()) {
+                let endTurn = true
                 let title = `You Stole 2 coins from ${targetPlayer.username}!`
                 if (msg.message.action === 'Assassinate') {
                   this.updateCoins(-3)
                   this.updateTreasury(3)
                   title = `You spent 3 coins and Assassinated ${targetPlayer.username}!`
+                  endTurn = false
                 }
                 Swal.fire({
                   title: `Waiting for ${targetPlayer.username}.`,
@@ -165,6 +167,7 @@ class Game extends React.Component {
                       icon: 'success'
                     })
                     this.useAction(msg.message.action, targetPlayer.id)
+                    endTurn && this.endTurn()
                   }
                 })
               }
@@ -450,7 +453,7 @@ class Game extends React.Component {
                   timerProgressBar: true,
                 })
                 .then(r => {
-                  this.useAction(msg.message.action, msg.message.targetPlayerId)
+                  this.useAction(msg.message.action, msg.message.challengingPlayerId)
                   this.getNewCard(msg.message.challengedCard)
                 })
               } else if (!this.isYourTurn()) {
@@ -505,7 +508,7 @@ class Game extends React.Component {
               }
             } else if (this.props.player.id === msg.message.challengingPlayerId) {
               if (this.isYourTurn()) {
-                this.useAction(msg.message.action, msg.message.targetPlayerId)
+                this.useAction(msg.message.action, msg.message.challengedPlayerId)
                 Swal.fire({
                   title: `You won the challenge! You use ${msg.message.action}.`,
                   text: `${msg.message.challengedPlayerUn} loses a card.`,
@@ -514,7 +517,6 @@ class Game extends React.Component {
                   timerProgressBar: true,
                 })
               } else if (!this.isYourTurn()) {
-
                 Swal.fire({
                   title: `You won the challenge! You blocked ${msg.message.challengedPlayerUn}'s ${msg.message.action}!`,
                   text: `${msg.message.challengedPlayerUn} loses a card.`,
@@ -543,14 +545,18 @@ class Game extends React.Component {
                   .then(r => {this.loseCard()})
                   break
                 case 'Steal':
-                  this.updateCoins(-2)
-                  Swal.fire({
-                    title: `${this.props.activePlayer.username} Stole 2 coins from you!`,
-                    showConfirmButton: false,
-                    allowOutsideClick: false,
-                    timer: 2000,
-                  })
-                  this.endTurn()
+                  let amt = 2
+                  const remainder = this.props.player.coins - 2
+                  if (remainder < 0) {
+                    amt += remainder
+                  }
+                  this.updateCoins(-amt)
+                  // Swal.fire({
+                  //   title: `${this.props.activePlayer.username} Stole 2 coins from you!`,
+                  //   showConfirmButton: false,
+                  //   allowOutsideClick: false,
+                  //   timer: 2000,
+                  // })
                   break
                 default:
                   console.error(`Invalid Targeted Action: ${msg.message.action}`)
@@ -670,6 +676,7 @@ class Game extends React.Component {
   // may need to move up or down
   useAction = (action, targetPlayerId = NaN) => {
     console.log('Using ' + action)
+    console.log('Target player ID: ' + targetPlayerId)
     switch (action) {
       // incone is handled in Player.js
       case 'Foreign Aid':
@@ -683,7 +690,12 @@ class Game extends React.Component {
         this.endTurn()
         break
       case 'Steal':
-        this.updateCoins(2)
+        let amt = 2
+        const remainder = this.props.players.find(player => player.id === targetPlayerId).coins - 2
+        if (remainder < 0) {
+          amt += remainder
+        }
+        this.updateCoins(amt)
       // eslint-disable-next-line
       case 'Coup':
       case 'Assassinate':
