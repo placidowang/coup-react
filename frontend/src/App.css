@@ -8,13 +8,20 @@
   /* font-weight: 900; */
 }
 
-.swal2-title {
-  font-family: 'muli';
+/* need to grab h2, otherwise auto-generated swal2-title rules take priority */
+h2#swal2-title {
+  font-weight: 400;
+  font-family:
+    'muli',
+    'roboto',
+    sans-serif;
 }
 
 /* not sure if this does anything */
 .swal2-text {
-  font-family: 'muli';
+  font-family:
+    'muli',
+    'roboto';
 }
 
 .swal2-content {

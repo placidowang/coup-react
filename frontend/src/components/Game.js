@@ -75,7 +75,7 @@ class Game extends React.Component {
                 let counterCard = undefined
 
                 Swal.fire({
-                  title: `${this.props.activePlayer.username} is trying to use ${msg.message.action} on you with a ${msg.message.associatedCard}!`,
+                  title: `${this.props.activePlayer.username} is trying to use ${msg.message.action} on you with ${this.aOrAn(msg.message.associatedCard)} ${msg.message.associatedCard}!`,
                   timer: globalSwalTimer,
                   timerProgressBar: true,
                   confirmButtonText: 'CHALLENGE',
@@ -111,7 +111,7 @@ class Game extends React.Component {
                 .then(r => {
                   // console.log(r)
                   if (counterCard) {
-                    console.log(`Attempting to block with a ${counterCard}.`)
+                    console.log(`Attempting to block with a(n) ${counterCard}.`)
                     this.props.pubnub.publish({
                       message: {
                         type: 'counter',
@@ -182,7 +182,7 @@ class Game extends React.Component {
                   timerProgressBar: true,
                   showCancelButton: true,
                   cancelButtonText: `Let ${this.props.activePlayer.username} use ${msg.message.action}... this time.`,
-                  confirmButtonText: `BLOCK with a ${msg.message.counterCard}.`,
+                  confirmButtonText: `BLOCK with ${this.aOrAn(msg.message.counterCard)} ${msg.message.counterCard}.`,
                   html: `<span class='swal2-text'>Letting ${this.props.activePlayer.username} use ${msg.message.action} in <b></b></span>`,
                   onBeforeOpen: () => {
                     setInterval(() => {
@@ -216,7 +216,7 @@ class Game extends React.Component {
                 })
               } else if (msg.message.associatedCard && !msg.message.counterCard) {
                 Swal.fire({
-                  title: `${this.props.activePlayer.username} is trying to use ${msg.message.action} with a ${msg.message.associatedCard}!`,
+                  title: `${this.props.activePlayer.username} is trying to use ${msg.message.action} with ${this.aOrAn(msg.message.associatedCard)} ${msg.message.associatedCard}!`,
                   timer: globalSwalTimer,
                   timerProgressBar: true,
                   showCancelButton: true,
@@ -287,7 +287,7 @@ class Game extends React.Component {
             if (this.props.player.id === msg.message.counteredPlayerId) {
               Swal.close()
               Swal.fire({
-                title: `${msg.message.counteringPlayerUn} is trying to BLOCK your ${msg.message.action} with a ${msg.message.counterCard}!`,
+                title: `${msg.message.counteringPlayerUn} is trying to BLOCK your ${msg.message.action} with ${this.aOrAn(msg.message.counterCard)} ${msg.message.counterCard}!`,
                 showCancelButton: true,
                 cancelButtonText: 'Back down',
                 confirmButtonText: 'CHALLENGE',
@@ -467,9 +467,10 @@ class Game extends React.Component {
                 .then(r => this.getNewCard(msg.message.challengedCard))
               }
             } else if (this.props.player.id === msg.message.challengingPlayerId) {
+              // check if challenged card is assassin, if so then lose game, and avoid firing assassinated modal
               if (this.props.player.hand.filter(card => card.isRevealed === true).length === 1) {
                 Swal.fire({
-                  title: `${msg.message.challengedPlayerUn} had a ${msg.message.challengedCard}!`,
+                  title: `${msg.message.challengedPlayerUn} had ${this.aOrAn(msg.message.challengedCard)} ${msg.message.challengedCard}!`,
                   timer: 2000,
                   showConfirmButton: false,
                   allowOutsideClick: false,
@@ -478,7 +479,7 @@ class Game extends React.Component {
               } else {
                 Swal.close()
                 Swal.fire({
-                  title: `${msg.message.challengedPlayerUn} had a ${msg.message.challengedCard}! You lost the challenge!`,
+                  title: `${msg.message.challengedPlayerUn} had ${this.aOrAn(msg.message.challengedCard)} ${msg.message.challengedCard}! You lost the challenge!`,
                   text: 'You lose a card.',
                   icon: 'error',
                   allowEscapeKey: false,
@@ -492,6 +493,8 @@ class Game extends React.Component {
             break
           case 'challengedPlayerLost':
             if (this.props.player.id === msg.message.challengedPlayerId) {
+              // check if challenged card is assassin, if so then lose game, and avoid firing assassinated modal
+
               if (this.props.player.hand.filter(card => card.isRevealed === true).length === 1) {
                 this.gameOver()
               } else {
@@ -645,6 +648,10 @@ class Game extends React.Component {
     return (this.props.activePlayer.id === this.props.player.id)
   }
 
+  aOrAn = (word) => {
+    return /[aeiouAEIOU]/.test(word.charAt(0)) ? "an" : "a"
+  }
+
   // need this in case players aren't automatically synced, which they probably won't be
   updatePlayer = () => {
     // console.log(this.props.player.coins + 'coins')
@@ -778,10 +785,9 @@ class Game extends React.Component {
     const oldCard = this.props.player.hand.find(card => card.name === challengedCard)
     this.props.deck.push(oldCard)
     const newCard = this.shuffleDeck(this.props.deck, true)
-    const aOrAn = /[AEIOU]/.test(newCard.name.charAt(0)) ? "an" : "a"
-    console.log(`You shuffled in your ${oldCard.name} and got ${aOrAn} ${newCard.name}!`)
+    console.log(`You shuffled in your ${oldCard.name} and got ${this.aOrAn(newCard.name)} ${newCard.name}!`)
     Swal.fire({
-      title: `You shuffled in your ${oldCard.name} and got ${aOrAn} ${newCard.name}!`,
+      title: `You shuffled in your ${oldCard.name} and got ${this.aOrAn(newCard.name)} ${newCard.name}!`,
       timer: 2000,
       showConfirmButton: false,
     })
@@ -815,7 +821,7 @@ class Game extends React.Component {
     // skip player in turn order; cannot just remove player from players list or their cards will also be removed
 
     // await next line? problem with determining next turn when a player is defeated
-    this.props.gameOver()
+    await this.props.gameOver()
     await this.updatePlayer()
     this.endTurn()
   }
