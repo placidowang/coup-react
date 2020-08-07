@@ -685,7 +685,7 @@ class Game extends React.Component {
     console.log('Using ' + action)
     console.log('Target player ID: ' + targetPlayerId)
     switch (action) {
-      // incone is handled in Player.js
+      // income is handled in Player.js
       case 'Foreign Aid':
         this.updateCoins(2)
         this.updateTreasury(-2)
