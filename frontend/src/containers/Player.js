@@ -177,7 +177,7 @@ class Player extends React.Component {
     for (const action in this.props.player.actions) {
       actions.push(this.props.player.actions[action])
     }
-    console.log(actions)
+    // console.log(actions)
     return (
       <div className='player-container'>
         <div className='player-name-hand-coin-container'>
@@ -202,23 +202,25 @@ class Player extends React.Component {
             </div>
           )}
         </div> */}
-        <table className='actions'>
-          <tr>
-            <th>Action</th>
-            <th>Character</th>
-            <th>Effect</th>
-            <th>Counteraction</th>
-          </tr>
-          {actions.map(action => 
-            <tr className='action' key={action.action}>
-              <td>
-                <button onClick={e => this.handleClickAction(e.target.value)} id={action.action} value={action.action} disabled={this.isYourTurn() ? '' : 'disabled'}>{action.action}</button>
-              </td>
-              <td>{action.character}</td>
-              <td>{action.effect}</td>
-              <td>{action.counteraction}</td>
+        <table id='actions'>
+          <tbody>
+            <tr>
+              <th>Action</th>
+              <th>Character</th>
+              <th className='Effect'>Effect</th>
+              <th>Counteraction</th>
             </tr>
-          )}
+            {actions.map(action => 
+              <tr className='action' key={action.action}>
+                <td>
+                  <button onClick={e => this.handleClickAction(e.target.value)} id={action.action} value={action.action} disabled={this.isYourTurn() ? '' : 'disabled'}>{action.action}</button>
+                </td>
+                <td className={action.character}>{action.character ? action.character : 'X'}</td>
+                <td>{action.effect ? action.effect : 'X'}</td>
+                <td>{action.counteraction ? action.counteraction : 'X'}</td>
+              </tr>
+            )}
+          </tbody>
         </table>
       </div>
     )

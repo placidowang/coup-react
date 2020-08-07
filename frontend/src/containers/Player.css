@@ -90,21 +90,35 @@ p.player-name {
   text-shadow: 6px 2px rgba(0,0,0,0.8);
 }
 
-.actions {
+#actions {
   display: fixed;
-  width: 1000px;
+  width: 600px;
+  height: 100%;
+  font-size: 14px;
+  border-collapse: collapse;
 }
 
-/* .action {
+/* #action {
   display: inline-block;
 } */
 
+#actions th, #actions td {
+  border: 1px solid rgb(165, 165, 165);
+  margin: 0px;
+}
+
+.Effect {
+  width: 200px;
+}
+
 .action button {
+  height: 100%;
+  width: 100%;
   font-size: 14px;
   margin: 3px;
 }
 
-.action button#Tax {
+.action td.Duke {
   background-color: rgb(255, 23, 255);
 }
 
