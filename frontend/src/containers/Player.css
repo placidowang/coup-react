@@ -1,15 +1,18 @@
 .player-container {
-  /* height: 35vh; */
   height: 380px;
-  margin: 5px;
+  width: 1050px;
+  /* margin: 5px; */
+  margin: auto;
   border-color: black;
   border-style: solid;
   border-width: 4px;
-  position: absolute;
-  top: 426px;
-  left: 50vw;
-  transform: translateX(-50%);
+  /* position: relative; */
+  /* position: absolute; */
+  top: 450px;
+  /* left: 0px; */
+  /* transform: translateX(calc(1050px - 100vw)); */
   display: inline-flex;
+  /* overflow: visible; */
 }
 
 .player-container p {
@@ -51,6 +54,7 @@ p.player-name {
   /* border-color: black; */
   /* border-style: solid; */
   /* border-width: 1px; */
+  /* position: fixed; */
   width: 472px;
   /* height: 100%; */
   height: 320px;
@@ -92,7 +96,7 @@ p.player-name {
 
 #actions {
   display: fixed;
-  width: 600px;
+  /* width: 600px; */
   height: 100%;
   font-size: 14px;
   border-collapse: collapse;
@@ -102,12 +106,16 @@ p.player-name {
   display: inline-block;
 } */
 
+#actions th {
+  height: 30px;
+}
+
 #actions th, #actions td {
   border: 1px solid rgb(165, 165, 165);
   margin: 0px;
 }
 
-.Effect {
+.effect {
   width: 200px;
 }
 
@@ -122,18 +130,18 @@ p.player-name {
   background-color: rgb(255, 23, 255);
 }
 
-.action button#Assassinate {
+.action td.Assassin {
   background-color: rgb(110, 110, 110);
 }
 
-.action button#Steal {
+.action td.Captain {
   background-color: rgb(22, 76, 253);
 }
 
-.action button#Exchange {
+.action td.Ambassador {
   background-color: rgb(251, 209, 93);
 }
 
-.action button#X {
+.action td.Contessa {
   background-color: rgb(255, 80, 80);
 }

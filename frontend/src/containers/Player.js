@@ -207,7 +207,7 @@ class Player extends React.Component {
             <tr>
               <th>Action</th>
               <th>Character</th>
-              <th className='Effect'>Effect</th>
+              <th className='effect'>Effect</th>
               <th>Counteraction</th>
             </tr>
             {actions.map(action => 

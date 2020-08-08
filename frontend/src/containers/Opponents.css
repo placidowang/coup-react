@@ -1,10 +1,11 @@
 .opponents-container {
   justify-content: center;
-  border-style: solid;
-  border-color: black;
+  /* border-style: solid; */
+  /* border-color: black; */
+  border-bottom: 3px solid black;
   height: 234px;
   width: 100vw;
-  margin: -11px;
+  margin: -8px;
   top: 0px;
 }
 

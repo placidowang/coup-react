@@ -858,6 +858,7 @@ class Game extends React.Component {
           <Card />
           <p>Court Deck: {this.props.deck.length} cards</p>
         </div>
+        <br/>
         {/* <p>Deck: {this.props.deck.map(card => card.name).join(', ')}</p> */}
         {/* <button onClick={()=>this.shuffleDeck()}>Shuffle Deck</button> */}
         {/* <button onClick={() => this.testMsg('GAME YO')}>message</button> */}
