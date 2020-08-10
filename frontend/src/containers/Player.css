@@ -90,7 +90,7 @@ p.player-name {
   position: absolute;
   z-index: 1;
   width: 227px;
-  bottom: 20px;
+  top: 474px;
   text-shadow: 6px 2px rgba(0,0,0,0.8);
 }
 

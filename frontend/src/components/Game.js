@@ -59,15 +59,17 @@ class Game extends React.Component {
             break
           case 'target':
             targetPlayer = this.props.players.find(player => player.id === msg.message.targetPlayerId)
-            if (msg.message.action === 'Coup' && this.isYourTurn()) {
-              this.updateCoins(-7)
-              this.updateTreasury(7)
-              Swal.fire({
-                title: `You spent 7 coins and Couped ${targetPlayer.username}!`,
-                showConfirmButton: false,
-                timer: 2000,
-              })
-              this.useAction(msg.message.action, targetPlayer.id)
+            if (msg.message.action === 'Coup') {
+              if (this.isYourTurn()) {
+                this.updateCoins(-7)
+                this.updateTreasury(7)
+                Swal.fire({
+                  title: `You spent 7 coins and Couped ${targetPlayer.username}!`,
+                  showConfirmButton: false,
+                  timer: 2000,
+                })
+                this.useAction(msg.message.action, targetPlayer.id)
+              }
 
               // if targeted action is not Coup, i.e. Assassinate/Steal
             } else {
