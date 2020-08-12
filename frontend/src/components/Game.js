@@ -468,10 +468,10 @@ class Game extends React.Component {
                 .then(r => this.getNewCard(msg.message.challengedCard))
               }
             } else if (this.props.player.id === msg.message.challengingPlayerId) {
-              console.log('fofo')
+              // console.log('fofo')
               // check if challenged card is assassin, if so then lose game, and avoid firing assassinated modal
               if (this.props.player.hand.filter(card => card.isRevealed === true).length === 1) {
-              console.log('nono')
+              // console.log('nono')
 
                 Swal.fire({
                   title: `${msg.message.challengedPlayerUn} had ${this.aOrAn(msg.message.challengedCard)} ${msg.message.challengedCard}!`,
