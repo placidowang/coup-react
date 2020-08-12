@@ -11,11 +11,12 @@ const globalSwalTimer = 10000
 class Game extends React.Component {
   componentDidMount(){
     if (this.props.isHost) {
-      fetch('http://localhost:3000/deck')
-      .then(r => r.json())
-      .then(deckData => {
-        this.initializeGame(deckData)
-      })
+      // fetch('http://localhost:3000/deck')
+      // .then(r => r.json())
+      // .then(deckData => {
+      //   this.initializeGame(deckData)
+      // })
+      this.initializeGame()
     }
 
     let targetPlayer
@@ -470,6 +471,7 @@ class Game extends React.Component {
             } else if (this.props.player.id === msg.message.challengingPlayerId) {
               // console.log('fofo')
               // check if challenged card is assassin, if so then lose game, and avoid firing assassinated modal
+              // ignore above if going for implementing the stack
               if (this.props.player.hand.filter(card => card.isRevealed === true).length === 1) {
               // console.log('nono')
 
@@ -592,9 +594,9 @@ class Game extends React.Component {
   }
   
   initializeGame = (deckData) => {
-    let deck = deckData.cards.map(card => ({...card, isRevealed: false}))
-    // deck = deck.filter(card => card.name === "Duke" || card.name === "Assassin")
-    const shuffledDeck = this.shuffleDeck(deck)
+  // initializeGame = (deckData) => {
+    // let deck = deckData.cards.map(card => ({...card, isRevealed: false}))
+    const shuffledDeck = this.shuffleDeck(this.props.deck)
     this.distributeCards(shuffledDeck)
   }
 
