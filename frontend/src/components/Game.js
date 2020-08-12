@@ -455,8 +455,7 @@ class Game extends React.Component {
                   timerProgressBar: true,
                 })
                 .then(r => {
-                  this.useAction(msg.message.action, msg.message.challengingPlayerId)
-                  this.getNewCard(msg.message.challengedCard)
+                  this.getNewCard(msg.message.challengedCard, () => this.useAction(msg.message.action, msg.message.challengingPlayerId))
                 })
               } else if (!this.isYourTurn()) {
                 Swal.fire({
@@ -469,8 +468,11 @@ class Game extends React.Component {
                 .then(r => this.getNewCard(msg.message.challengedCard))
               }
             } else if (this.props.player.id === msg.message.challengingPlayerId) {
+              console.log('fofo')
               // check if challenged card is assassin, if so then lose game, and avoid firing assassinated modal
               if (this.props.player.hand.filter(card => card.isRevealed === true).length === 1) {
+              console.log('nono')
+
                 Swal.fire({
                   title: `${msg.message.challengedPlayerUn} had ${this.aOrAn(msg.message.challengedCard)} ${msg.message.challengedCard}!`,
                   timer: 2000,
@@ -718,7 +720,14 @@ class Game extends React.Component {
         })
         break
       case 'Exchange':
+        const numberOfCardsToKeep = this.props.player.hand.filter(card => card.isRevealed === false).length
+        const nextCard = this.props.deck.shift()
+        const nextCard2 = this.props.deck.shift()
+        console.log(nextCard, nextCard2)
+        Swal.fire({
+          title: `Choose ${numberOfCardsToKeep} card(s) to keep.`
 
+        })
         break
       default:
         console.error('Invalid action.')
@@ -783,7 +792,7 @@ class Game extends React.Component {
   }
 
   // after showing winning a card, shuffle it into deck and draw a new card
-  getNewCard = (challengedCard) => {
+  getNewCard = (challengedCard, fn) => {
     const oldCard = this.props.player.hand.find(card => card.name === challengedCard)
     this.props.deck.push(oldCard)
     const newCard = this.shuffleDeck(this.props.deck, true)
@@ -793,6 +802,7 @@ class Game extends React.Component {
       timer: 2000,
       showConfirmButton: false,
     })
+    .then(fn)
 
     const newHand = [...this.props.player.hand]
     newHand[newHand.findIndex(card => card.id === oldCard.id)] = newCard
