@@ -172,6 +172,7 @@ class Lobby extends React.Component {
     // this.props.players.map(player => console.log(player.username))
     return(
       <div>
+        <img src='./images/duke.png'/>
         <p>Welcome, <span style={{color: 'red', fontSize: 40}}>{this.props.player.username}</span>.</p>
 
         {!this.props.lobbyChannel &&
