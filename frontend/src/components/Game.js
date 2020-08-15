@@ -861,8 +861,8 @@ class Game extends React.Component {
   }
 
   render() {
-    console.log('game component rendering')
-    return (
+    console.log('game component rendering?')
+    return(
       <div className='game'>
         <OpponentsContainer />
         <p className='whose-turn'>Whose turn: {this.props.activePlayer.username ? this.props.activePlayer.username : null}</p>
