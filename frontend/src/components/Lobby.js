@@ -4,6 +4,7 @@ import Swal from 'sweetalert2'
 
 class Lobby extends React.Component {
   componentDidMount() {
+    console.log('lobby component mounting')
 
   }
 
@@ -170,6 +171,7 @@ class Lobby extends React.Component {
   render() {
     // console.log('rendering: ' + this.props.players)
     // this.props.players.map(player => console.log(player.username))
+    console.log('lobby component rendering')
     return(
       <div>
         <p>Welcome, <span style={{color: 'red', fontSize: 40}}>{this.props.player.username}</span>.</p>

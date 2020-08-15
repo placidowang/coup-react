@@ -1,31 +1,51 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "9914b4e55bff309c85b59b9d574c1a6f",
+    "revision": "30af86c909a37c7e1b345161e5e8379e",
     "url": "/coup-react/index.html"
   },
   {
-    "revision": "bb95cdebfa90aede9d7f",
+    "revision": "9a77ec842153762f9617",
     "url": "/coup-react/static/css/2.e1cb04bf.chunk.css"
   },
   {
-    "revision": "c753c3b882b6b711a937",
+    "revision": "e9bc2531f9542c1f139b",
     "url": "/coup-react/static/css/main.8e01ed1e.chunk.css"
   },
   {
-    "revision": "bb95cdebfa90aede9d7f",
-    "url": "/coup-react/static/js/2.c231d270.chunk.js"
+    "revision": "9a77ec842153762f9617",
+    "url": "/coup-react/static/js/2.967b7bc8.chunk.js"
   },
   {
     "revision": "c64c486544348f10a6d6c716950bc223",
-    "url": "/coup-react/static/js/2.c231d270.chunk.js.LICENSE.txt"
+    "url": "/coup-react/static/js/2.967b7bc8.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "c753c3b882b6b711a937",
-    "url": "/coup-react/static/js/main.50589af3.chunk.js"
+    "revision": "e9bc2531f9542c1f139b",
+    "url": "/coup-react/static/js/main.cbf95efa.chunk.js"
   },
   {
     "revision": "e634e8901bc7da13b77d",
     "url": "/coup-react/static/js/runtime-main.46336b61.js"
+  },
+  {
+    "revision": "a580bcd9ea19eb036ebdc067e0c53818",
+    "url": "/coup-react/static/media/ambassador.a580bcd9.png"
+  },
+  {
+    "revision": "3eba77a1c423c1c10c18624436188646",
+    "url": "/coup-react/static/media/assassin.3eba77a1.png"
+  },
+  {
+    "revision": "d15ed8e05334aa729d0f93a562d50362",
+    "url": "/coup-react/static/media/captain.d15ed8e0.png"
+  },
+  {
+    "revision": "00c21b91d4404414e6ffafef1a1d907d",
+    "url": "/coup-react/static/media/contessa.00c21b91.png"
+  },
+  {
+    "revision": "36f797ff7d518e8f8b2bd09f73bb34e7",
+    "url": "/coup-react/static/media/duke.36f797ff.png"
   },
   {
     "revision": "b9e633f07681fcfa7099f1760c6e8dc7",

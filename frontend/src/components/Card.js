@@ -22,7 +22,7 @@ class Card extends React.Component {
     // console.log(this.props.card)
     if (this.props.card) {
       if (this.props.card.isRevealed) {
-        return(
+        return (
             <div className='overlay'>
               <p className='x'>X</p>
               <div className={`card ${this.props.card.name.toLowerCase()} revealed`}>
@@ -39,7 +39,7 @@ class Card extends React.Component {
             </div>
         )
       } else {
-        return(
+        return (
           <div className={`card ${this.props.card.name.toLowerCase()}`}>
             <p className='card-name'>{this.props.card.name.toUpperCase()}</p>
             <img className='portrait' src={cardImgData[this.props.card.name.toLowerCase()]} alt={this.props.card.name} />
