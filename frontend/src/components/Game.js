@@ -872,7 +872,7 @@ class Game extends React.Component {
         </div>
 
         <div className='court-deck'>
-          {/* <Card /> */}
+          <Card />
           <p>Court Deck: {this.props.deck.length} cards</p>
         </div>
         <br/>
