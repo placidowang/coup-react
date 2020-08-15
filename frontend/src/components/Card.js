@@ -19,6 +19,9 @@ const cardImgData = {
 
 class Card extends React.Component {
   render() {
+    return (
+      <p>sup, yo</p>
+    )
     // console.log(this.props.card)
     if (this.props.card) {
       if (this.props.card.isRevealed) {

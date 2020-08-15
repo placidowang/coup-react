@@ -4,7 +4,8 @@ import Game from '../components/Game';
 import Lobby from '../components/Lobby.js'
 
 class GameContainer extends React.Component {
-  render() {  
+  render() {
+    console.log(this.props.isPlaying ? 'game' : 'lobby')
     return (  
       <div>
         {!this.props.isPlaying &&
