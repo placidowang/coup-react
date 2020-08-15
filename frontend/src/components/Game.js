@@ -864,15 +864,15 @@ class Game extends React.Component {
     console.log('game component rendering?')
     return(
       <div className='game'>
-        <OpponentsContainer />
-        <p className='whose-turn'>Whose turn: {this.props.activePlayer.username ? this.props.activePlayer.username : null}</p>
+        {/* <OpponentsContainer /> */}
+        {/* <p className='whose-turn'>Whose turn: {this.props.activePlayer.username ? this.props.activePlayer.username : null}</p> */}
 
         <div className='treasury'>
           <p>Treasury: {this.props.treasury} coins</p>
         </div>
 
         <div className='court-deck'>
-          <Card />
+          {/* <Card /> */}
           <p>Court Deck: {this.props.deck.length} cards</p>
         </div>
         <br/>
@@ -885,7 +885,7 @@ class Game extends React.Component {
         {/* <br/><button onClick={this.endTurn}>End Turn</button> */}
 
         {/* <p style={{fontSize: '20px'}}>Players: {this.props.players.map(player => player.username).join(', ')}</p> */}
-        <Player />
+        {/* <Player /> */}
       </div>
     );
   }
