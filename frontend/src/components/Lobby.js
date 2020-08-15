@@ -174,7 +174,7 @@ class Lobby extends React.Component {
     console.log('lobby component rendering')
     return(
       <div>
-        <p>Welcome, <span style={{color: 'red', fontSize: 40}}>{this.props.player.username}</span>.</p>
+        <p>4 Welcome, <span style={{color: 'red', fontSize: 40}}>{this.props.player.username}</span>.</p>
 
         {!this.props.lobbyChannel &&
           <div>

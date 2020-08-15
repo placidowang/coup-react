@@ -3,9 +3,10 @@ import { connect } from 'react-redux'
 import Opponent from '../components/Opponent.js'
 import './Opponents.css'
 
+
 class OpponentsContainer extends React.Component {
-
-
+  
+  
   render() {
     const opponents = this.props.players.filter(player => player.id !== this.props.player.id)
     return(

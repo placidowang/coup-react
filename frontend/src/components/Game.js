@@ -865,10 +865,10 @@ class Game extends React.Component {
     return(
       <div className='game'>
         <OpponentsContainer />
-        {/* <p className='whose-turn'>Whose turn: {this.props.activePlayer.username ? this.props.activePlayer.username : null}</p> */}
+        <p className='whose-turn'>Whose turn: {this.props.activePlayer.username ? this.props.activePlayer.username : null}</p>
 
         <div className='treasury'>
-          <p>2 Treasury: {this.props.treasury} coins</p>
+          <p>Treasury: {this.props.treasury} coins</p>
         </div>
 
         <div className='court-deck'>
