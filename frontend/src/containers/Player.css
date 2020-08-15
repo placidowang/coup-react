@@ -78,10 +78,10 @@ p.player-name {
   /* z-index: -2; */
 }
 
-.player-hand div.overlay {
+/* .player-hand div.overlay { */
   /* width: 100%; */
   /* text-align: center; */
-}
+/* } */
 
 .player-hand p.x {
   color: red;
