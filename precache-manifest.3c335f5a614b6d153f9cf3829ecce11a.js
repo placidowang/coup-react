@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "db1ddad06fcaed58dcc002a5e0066f98",
+    "revision": "91dece21e4daf54cf9e67f64dcbaeab2",
     "url": "/coup-react/index.html"
   },
   {
@@ -8,7 +8,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/coup-react/static/css/2.e1cb04bf.chunk.css"
   },
   {
-    "revision": "89484b159bc8ee312471",
+    "revision": "cfaf4af8517f9f8c7175",
     "url": "/coup-react/static/css/main.7d302620.chunk.css"
   },
   {
@@ -20,8 +20,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/coup-react/static/js/2.967b7bc8.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "89484b159bc8ee312471",
-    "url": "/coup-react/static/js/main.fa9e46b4.chunk.js"
+    "revision": "cfaf4af8517f9f8c7175",
+    "url": "/coup-react/static/js/main.81ad035f.chunk.js"
   },
   {
     "revision": "e634e8901bc7da13b77d",
