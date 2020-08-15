@@ -1,26 +1,31 @@
 {
   "files": {
     "main.css": "/coup-react/static/css/main.8e01ed1e.chunk.css",
-    "main.js": "/coup-react/static/js/main.50589af3.chunk.js",
-    "main.js.map": "/coup-react/static/js/main.50589af3.chunk.js.map",
+    "main.js": "/coup-react/static/js/main.ccd5d6dd.chunk.js",
+    "main.js.map": "/coup-react/static/js/main.ccd5d6dd.chunk.js.map",
     "runtime-main.js": "/coup-react/static/js/runtime-main.46336b61.js",
     "runtime-main.js.map": "/coup-react/static/js/runtime-main.46336b61.js.map",
     "static/css/2.e1cb04bf.chunk.css": "/coup-react/static/css/2.e1cb04bf.chunk.css",
-    "static/js/2.c231d270.chunk.js": "/coup-react/static/js/2.c231d270.chunk.js",
-    "static/js/2.c231d270.chunk.js.map": "/coup-react/static/js/2.c231d270.chunk.js.map",
+    "static/js/2.967b7bc8.chunk.js": "/coup-react/static/js/2.967b7bc8.chunk.js",
+    "static/js/2.967b7bc8.chunk.js.map": "/coup-react/static/js/2.967b7bc8.chunk.js.map",
     "index.html": "/coup-react/index.html",
-    "precache-manifest.859f45c05fa47733822bf8ce6e9942f4.js": "/coup-react/precache-manifest.859f45c05fa47733822bf8ce6e9942f4.js",
+    "precache-manifest.b3ec8084ece2f8cd7b3b3f061df81658.js": "/coup-react/precache-manifest.b3ec8084ece2f8cd7b3b3f061df81658.js",
     "service-worker.js": "/coup-react/service-worker.js",
     "static/css/2.e1cb04bf.chunk.css.map": "/coup-react/static/css/2.e1cb04bf.chunk.css.map",
     "static/css/main.8e01ed1e.chunk.css.map": "/coup-react/static/css/main.8e01ed1e.chunk.css.map",
-    "static/js/2.c231d270.chunk.js.LICENSE.txt": "/coup-react/static/js/2.c231d270.chunk.js.LICENSE.txt",
+    "static/js/2.967b7bc8.chunk.js.LICENSE.txt": "/coup-react/static/js/2.967b7bc8.chunk.js.LICENSE.txt",
+    "static/media/ambassador.png": "/coup-react/static/media/ambassador.a580bcd9.png",
+    "static/media/assassin.png": "/coup-react/static/media/assassin.3eba77a1.png",
+    "static/media/captain.png": "/coup-react/static/media/captain.d15ed8e0.png",
+    "static/media/contessa.png": "/coup-react/static/media/contessa.00c21b91.png",
+    "static/media/duke.png": "/coup-react/static/media/duke.36f797ff.png",
     "static/media/index.css": "/coup-react/static/media/roboto-latin-900italic.ebf6d164.woff2"
   },
   "entrypoints": [
     "static/js/runtime-main.46336b61.js",
     "static/css/2.e1cb04bf.chunk.css",
-    "static/js/2.c231d270.chunk.js",
+    "static/js/2.967b7bc8.chunk.js",
     "static/css/main.8e01ed1e.chunk.css",
-    "static/js/main.50589af3.chunk.js"
+    "static/js/main.ccd5d6dd.chunk.js"
   ]
 }
