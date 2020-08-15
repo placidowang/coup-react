@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/coup-react/static/css/main.7d302620.chunk.css",
-    "main.js": "/coup-react/static/js/main.7c661479.chunk.js",
-    "main.js.map": "/coup-react/static/js/main.7c661479.chunk.js.map",
+    "main.js": "/coup-react/static/js/main.83517407.chunk.js",
+    "main.js.map": "/coup-react/static/js/main.83517407.chunk.js.map",
     "runtime-main.js": "/coup-react/static/js/runtime-main.46336b61.js",
     "runtime-main.js.map": "/coup-react/static/js/runtime-main.46336b61.js.map",
     "static/css/2.e1cb04bf.chunk.css": "/coup-react/static/css/2.e1cb04bf.chunk.css",
     "static/js/2.967b7bc8.chunk.js": "/coup-react/static/js/2.967b7bc8.chunk.js",
     "static/js/2.967b7bc8.chunk.js.map": "/coup-react/static/js/2.967b7bc8.chunk.js.map",
     "index.html": "/coup-react/index.html",
-    "precache-manifest.895db6fe2c195ff46d41fd56d52906cc.js": "/coup-react/precache-manifest.895db6fe2c195ff46d41fd56d52906cc.js",
+    "precache-manifest.860c48ea1bfd9d5086c6f2ab47015779.js": "/coup-react/precache-manifest.860c48ea1bfd9d5086c6f2ab47015779.js",
     "service-worker.js": "/coup-react/service-worker.js",
     "static/css/2.e1cb04bf.chunk.css.map": "/coup-react/static/css/2.e1cb04bf.chunk.css.map",
     "static/css/main.7d302620.chunk.css.map": "/coup-react/static/css/main.7d302620.chunk.css.map",
@@ -26,6 +26,6 @@
     "static/css/2.e1cb04bf.chunk.css",
     "static/js/2.967b7bc8.chunk.js",
     "static/css/main.7d302620.chunk.css",
-    "static/js/main.7c661479.chunk.js"
+    "static/js/main.83517407.chunk.js"
   ]
 }
