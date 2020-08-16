@@ -10,8 +10,6 @@ const globalSwalTimer = 10000
 
 class Game extends React.Component {
   componentDidMount(){
-    console.log('game component mounting')
-
     if (this.props.isHost) {
       // fetch('http://localhost:3000/deck')
       // .then(r => r.json())

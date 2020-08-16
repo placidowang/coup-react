@@ -4,7 +4,6 @@ import Swal from 'sweetalert2'
 
 class Lobby extends React.Component {
   componentDidMount() {
-    console.log('lobby component mounting')
 
   }
 

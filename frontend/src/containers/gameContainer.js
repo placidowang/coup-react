@@ -5,7 +5,6 @@ import Lobby from '../components/Lobby.js'
 
 class GameContainer extends React.Component {
   render() {
-    console.log(this.props.isPlaying ? 'game!?' : 'lobby!?!')
     return (  
       <div>
         {!this.props.isPlaying &&

@@ -1,6 +1,6 @@
 .game {
   font-size: 20px;
-  overflow: hidden;
+  overflow: scroll;
 }
 
 .whose-turn {
