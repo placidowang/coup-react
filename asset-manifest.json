@@ -1,6 +1,6 @@
 {
   "files": {
-    "main.css": "/coup-react/static/css/main.d83b86ef.chunk.css",
+    "main.css": "/coup-react/static/css/main.2387a910.chunk.css",
     "main.js": "/coup-react/static/js/main.41608ab9.chunk.js",
     "main.js.map": "/coup-react/static/js/main.41608ab9.chunk.js.map",
     "runtime-main.js": "/coup-react/static/js/runtime-main.46336b61.js",
@@ -9,10 +9,10 @@
     "static/js/2.967b7bc8.chunk.js": "/coup-react/static/js/2.967b7bc8.chunk.js",
     "static/js/2.967b7bc8.chunk.js.map": "/coup-react/static/js/2.967b7bc8.chunk.js.map",
     "index.html": "/coup-react/index.html",
-    "precache-manifest.fe39f80f527f9a6589045d9175896adc.js": "/coup-react/precache-manifest.fe39f80f527f9a6589045d9175896adc.js",
+    "precache-manifest.25e9db46976c19e3e03285362bfe9672.js": "/coup-react/precache-manifest.25e9db46976c19e3e03285362bfe9672.js",
     "service-worker.js": "/coup-react/service-worker.js",
     "static/css/2.e1cb04bf.chunk.css.map": "/coup-react/static/css/2.e1cb04bf.chunk.css.map",
-    "static/css/main.d83b86ef.chunk.css.map": "/coup-react/static/css/main.d83b86ef.chunk.css.map",
+    "static/css/main.2387a910.chunk.css.map": "/coup-react/static/css/main.2387a910.chunk.css.map",
     "static/js/2.967b7bc8.chunk.js.LICENSE.txt": "/coup-react/static/js/2.967b7bc8.chunk.js.LICENSE.txt",
     "static/media/ambassador.png": "/coup-react/static/media/ambassador.a580bcd9.png",
     "static/media/assassin.png": "/coup-react/static/media/assassin.3eba77a1.png",
@@ -25,7 +25,7 @@
     "static/js/runtime-main.46336b61.js",
     "static/css/2.e1cb04bf.chunk.css",
     "static/js/2.967b7bc8.chunk.js",
-    "static/css/main.d83b86ef.chunk.css",
+    "static/css/main.2387a910.chunk.css",
     "static/js/main.41608ab9.chunk.js"
   ]
 }
