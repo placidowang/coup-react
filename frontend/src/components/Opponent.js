@@ -10,8 +10,8 @@ class Opponent extends React.Component {
 
   render() {
     return(
-      // <button onClick={(e) => this.logId(e.target.value)} value={this.props.opponent.id} className='opponent'>
       <div onClick={() => this.getId(this.props.opponent.id)}className='opponent'>
+        {/* <button onClick={(e) => this.logId(e.target.value)} value={this.props.opponent.id} className='opponent'> */}
         <p className='opponent-name'>{this.props.opponent.username}</p>
         <p>Coins: {this.props.opponent.coins}</p>
 

@@ -861,7 +861,6 @@ class Game extends React.Component {
   }
 
   render() {
-    console.log('game component rendering?')
     return(
       <div className='game'>
         <OpponentsContainer />
@@ -885,7 +884,7 @@ class Game extends React.Component {
         {/* <br/><button onClick={this.endTurn}>End Turn</button> */}
 
         {/* <p style={{fontSize: '20px'}}>Players: {this.props.players.map(player => player.username).join(', ')}</p> */}
-        {/* <Player /> */}
+        <Player />
       </div>
     );
   }
