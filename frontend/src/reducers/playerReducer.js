@@ -1,8 +1,8 @@
 const initialState = {
   id: NaN,
   gameOver: false,
-  username: Math.random().toString(36).slice(2,5),
-  // username: '',
+  // username: Math.random().toString(36).slice(2,5),
+  username: '',
   hand: [],
   coins: 2,
   // actions: ['Income', 'Foreign Aid', 'Coup', 'Tax', 'Assassinate', 'Exchange', 'Steal'],
