@@ -281,7 +281,7 @@ class Game extends React.Component {
                     timer: 1500,
                     icon: 'success'
                   })
-                  this.useAction(msg.message.action)
+                  this.useAction(msg.message.action, undefined, true)
                 }
               })
             }
@@ -687,7 +687,7 @@ class Game extends React.Component {
   }
 
   // may need to move up or down
-  useAction = (action, targetPlayerId = NaN) => {
+  useAction = (action, targetPlayerId = NaN, endTurn) => {
     console.log('Using ' + action)
     console.log('Target player ID: ' + targetPlayerId)
     switch (action) {
@@ -695,12 +695,12 @@ class Game extends React.Component {
       case 'Foreign Aid':
         this.updateCoins(2)
         this.updateTreasury(-2)
-        this.endTurn()
+        endTurn && this.endTurn()
         break
       case 'Tax':
         this.updateCoins(3)
         this.updateTreasury(-3)
-        this.endTurn()
+        endTurn && this.endTurn()
         break
       case 'Steal':
         let amt = 2
@@ -730,6 +730,7 @@ class Game extends React.Component {
           title: `Choose ${numberOfCardsToKeep} card(s) to keep.`
 
         })
+
         break
       default:
         console.error('Invalid action.')
