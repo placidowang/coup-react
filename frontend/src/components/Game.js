@@ -51,7 +51,7 @@ class Game extends React.Component {
             if (this.props.activePlayer.id === currentActivePlayerId && this.isYourTurn()) {
               Swal.close()
               Swal.fire({
-                title: 'u win gj gg',
+                title: 'You win!',
                 confirmButtonText: 'New Game?',
                 allowOutsideClick: false
               })
