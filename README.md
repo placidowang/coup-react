@@ -10,3 +10,11 @@ Play with your friends! One player hosts the game and sends the room code to the
 To play the game, players take turns taking actions based on what cards they are dealt at the beginning of the game. Bluffing is allowed and encouraged! Be the last one standing to win the game!
 
 This project is WIP and not all features are fully implemented.
+
+### To play online
+https://placidowang.github.io/coup-react/
+
+### To run locally
+Clone down repo, then run
+
+`npm install && npm run`
