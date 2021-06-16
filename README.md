@@ -17,4 +17,4 @@ https://placidowang.github.io/coup-react/
 ### To run locally
 Clone down repo, then run
 
-`npm install && npm run`
+`cd frontend && npm install && npm start`
